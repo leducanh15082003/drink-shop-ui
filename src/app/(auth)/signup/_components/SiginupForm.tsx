@@ -1,13 +1,26 @@
 "use client";
 
-import { Form, Input, Button, Checkbox } from "antd";
+import { Form, Input, Button, Checkbox, message } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { htcService } from "@/utils/services/htcService";
 
 export default function SignupForm() {
   const [form] = Form.useForm();
+  const router = useRouter();
 
-  const onFinish = (values: unknown) => {
+  const onFinish = async (values: any) => {
     console.log("Signup Data:", values);
+    const { confirmPassword, ...registrationData } = values;
+    try {
+      const {data} = await htcService.api.createNewUser(values);
+      toast.success("Register Succesfully!");
+      router.push("/signin");
+    } catch (error) {
+      console.error("Error during registration:", error);
+      toast.error("Register Failed!");
+    }
   };
 
   return (
@@ -45,7 +58,7 @@ export default function SignupForm() {
       {/* Email */}
       <Form.Item
         label="Email address"
-        name="email"
+        name="userName"
         rules={[
           { required: true, message: "Please enter your email" },
           { type: "email", message: "Email is invalid" },

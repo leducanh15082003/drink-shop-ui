@@ -1,14 +1,41 @@
 "use client";
 
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { htcService } from "@/utils/services/htcService";
+import { toast } from "react-toastify";
+
+// type ResponseData = {token: string}
 
 export default function SigninForm() {
   const [form] = Form.useForm();
+  const router = useRouter();
 
-  const onFinish = (values: unknown) => {
-    console.log("Login Data:", values);
+  const onFinish = async (values: any) => {
+    try {
+      const loginData = {
+        username: values.email,
+        password: values.password,
+      };
+
+      // Call the authenticateUser function from the generated API client
+      const {data} = await htcService.api.authenticateUser(loginData);
+
+      // Assuming your backend returns an object with a token field
+      if (data && data.token) { 
+        console.log("token: ", data.token)
+        toast.success("Login successful!");
+        localStorage.setItem("token", data.token);
+        router.push("/"); 
+      } else {
+        toast.error("Login failed: Token not received");
+      }
+    } catch (error: any) {
+      console.error("Error during login:", error);
+      toast.error("Login failed!");
+    }
   };
 
   return (

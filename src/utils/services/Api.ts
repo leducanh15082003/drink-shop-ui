@@ -228,30 +228,14 @@ export class Api<SecurityDataType extends unknown> {
     /**
      * No description
      *
-     * @tags user-controller
-     * @name GetAllUsers
-     * @request GET:/api/v1/user
-     * @secure
-     */
-    getAllUsers: (params: RequestParams = {}) =>
-      this.http.request<User[], any>({
-        path: `/api/v1/user`,
-        method: "GET",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags user-controller
+     * @tags auth-controller
      * @name CreateNewUser
-     * @request POST:/api/v1/user
+     * @request POST:/api/auth/register
      * @secure
      */
     createNewUser: (data: User, params: RequestParams = {}) =>
       this.http.request<User, any>({
-        path: `/api/v1/user`,
+        path: `/api/auth/register`,
         method: "POST",
         body: data,
         secure: true,
@@ -274,6 +258,22 @@ export class Api<SecurityDataType extends unknown> {
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name GetAllUsers
+     * @request GET:/api/v1/user
+     * @secure
+     */
+    getAllUsers: (params: RequestParams = {}) =>
+      this.http.request<User[], any>({
+        path: `/api/v1/user`,
+        method: "GET",
+        secure: true,
         ...params,
       }),
 

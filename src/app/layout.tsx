@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { ConfigProvider } from "antd";
 import "@ant-design/v5-patch-for-react-19";
+import { ToastContainer } from "react-toastify";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -51,6 +52,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </ConfigProvider>
+        <ToastContainer />
       </body>
     </html>
   );
