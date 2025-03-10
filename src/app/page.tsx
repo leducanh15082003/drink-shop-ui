@@ -1,5 +1,3 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import Advertise from "@/components/homepage/Advertise";
 import Drink from "@/components/homepage/Drink";
 import Menu from "@/components/Menu";
@@ -34,7 +32,6 @@ const drinks = [
 export default function Home() {
   return (
     <div>
-      <Header />
       <main className="pb-28">
         {/* background image */}
         <div
@@ -163,7 +160,6 @@ export default function Home() {
         </div>
         {/* our menu */}
       </main>
-      <Footer />
     </div>
   );
 }

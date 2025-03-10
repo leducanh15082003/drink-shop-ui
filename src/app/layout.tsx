@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { DM_Sans, Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { ConfigProvider } from "antd";
+import "@ant-design/v5-patch-for-react-19";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -35,7 +39,18 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${poppins.variable} ${playfair.variable} antialiased`}
       >
-        {children}
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#AD343E",
+              borderRadius: 2,
+            },
+          }}
+        >
+          <Header />
+          {children}
+          <Footer />
+        </ConfigProvider>
       </body>
     </html>
   );
