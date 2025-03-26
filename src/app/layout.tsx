@@ -46,6 +46,13 @@ export default function RootLayout({
               colorPrimary: "#AD343E",
               borderRadius: 2,
             },
+            components: {
+              Slider: {
+                controlHeight: 5,
+                railSize: 10,
+                borderRadiusXS: 10,
+              },
+            },
           }}
         >
           <Header />
