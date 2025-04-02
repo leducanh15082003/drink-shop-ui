@@ -12,7 +12,9 @@
 export interface User {
   /** @format int64 */
   id?: number;
-  userName?: string;
+  fullName?: string;
+  phoneNumber?: string;
+  email?: string;
   password?: string;
   role?: "USER" | "ADMIN";
   /** @format date-time */
@@ -21,9 +23,135 @@ export interface User {
   updatedAt?: string;
 }
 
-export interface LoginRequestDTO {
-  username?: string;
+export interface Category {
+  /** @format int64 */
+  id?: number;
+  name?: string;
+  description?: string;
+  products?: Product[];
+}
+
+export interface Inventory {
+  /** @format int64 */
+  id?: number;
+  product?: Product;
+  /** @format int32 */
+  quantity?: number;
+  /** @format date-time */
+  updatedAt?: string;
+}
+
+export interface Order {
+  /** @format int64 */
+  id?: number;
+  user?: User;
+  /** @format double */
+  totalAmount?: number;
+  /** @format date-time */
+  orderTime?: string;
+  orderDetails?: OrderDetail[];
+  payment?: Payment;
+}
+
+export interface OrderDetail {
+  /** @format int64 */
+  id?: number;
+  order?: Order;
+  product?: Product;
+  /** @format int32 */
+  quantity?: number;
+  /** @format double */
+  unitPrice?: number;
+}
+
+export interface Payment {
+  /** @format int64 */
+  id?: number;
+  order?: Order;
+  /** @format double */
+  amount?: number;
+  paymentMethod?: string;
+  status?: string;
+  /** @format date-time */
+  transactionDate?: string;
+}
+
+export interface Product {
+  /** @format int64 */
+  id?: number;
+  name?: string;
+  description?: string;
+  ingredients?: string;
+  /** @format double */
+  price?: number;
+  imageUrl?: string;
+  category?: Category;
+  orderDetails?: OrderDetail[];
+  inventory?: Inventory;
+}
+
+export interface OrderDTO {
+  /** @format int64 */
+  id?: number;
+  /** @format int64 */
+  userId?: number;
+  /** @format double */
+  price?: number;
+  /** @format date-time */
+  orderTime?: string;
+  orderDetails?: OrderDetailsDTO[];
+}
+
+export interface OrderDetailsDTO {
+  /** @format int64 */
+  id?: number;
+  /** @format int64 */
+  productId?: number;
+  productName?: string;
+  /** @format int32 */
+  quantity?: number;
+  /** @format double */
+  unitPrice?: number;
+}
+
+export interface CartItemDTO {
+  /** @format int64 */
+  id?: number;
+  /** @format int64 */
+  productId?: number;
+  productName?: string;
+  /** @format int32 */
+  quantity?: number;
+  /** @format double */
+  unitPrice?: number;
+}
+
+export interface SignupRequestDTO {
+  fullName?: string;
+  phoneNumber?: string;
+  email?: string;
   password?: string;
+}
+
+export interface LoginRequestDTO {
+  email?: string;
+  password?: string;
+}
+
+export interface ProductDTO {
+  /** @format int64 */
+  id?: number;
+  name?: string;
+  /** @format double */
+  price?: number;
+  description?: string;
+  image?: string;
+}
+
+export interface CartDTO {
+  /** @format int64 */
+  id?: number;
+  items?: CartItemDTO[];
 }
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
@@ -180,12 +308,12 @@ export class Api<SecurityDataType extends unknown> {
      *
      * @tags user-controller
      * @name GetUserById
-     * @request GET:/api/v1/user/{id}
+     * @request GET:/api/user/{id}
      * @secure
      */
     getUserById: (id: number, params: RequestParams = {}) =>
       this.http.request<User, any>({
-        path: `/api/v1/user/${id}`,
+        path: `/api/user/${id}`,
         method: "GET",
         secure: true,
         ...params,
@@ -196,12 +324,12 @@ export class Api<SecurityDataType extends unknown> {
      *
      * @tags user-controller
      * @name UpdateUser
-     * @request PUT:/api/v1/user/{id}
+     * @request PUT:/api/user/{id}
      * @secure
      */
     updateUser: (id: number, data: User, params: RequestParams = {}) =>
       this.http.request<User, any>({
-        path: `/api/v1/user/${id}`,
+        path: `/api/user/${id}`,
         method: "PUT",
         body: data,
         secure: true,
@@ -214,13 +342,540 @@ export class Api<SecurityDataType extends unknown> {
      *
      * @tags user-controller
      * @name DeleteUser
-     * @request DELETE:/api/v1/user/{id}
+     * @request DELETE:/api/user/{id}
      * @secure
      */
     deleteUser: (id: number, params: RequestParams = {}) =>
       this.http.request<void, any>({
-        path: `/api/v1/user/${id}`,
+        path: `/api/user/${id}`,
         method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
+     * @name GetProductById
+     * @request GET:/api/products/{id}
+     * @secure
+     */
+    getProductById: (id: number, params: RequestParams = {}) =>
+      this.http.request<Product, any>({
+        path: `/api/products/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
+     * @name UpdateProduct
+     * @request PUT:/api/products/{id}
+     * @secure
+     */
+    updateProduct: (id: number, data: Product, params: RequestParams = {}) =>
+      this.http.request<Product, any>({
+        path: `/api/products/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
+     * @name DeleteProduct
+     * @request DELETE:/api/products/{id}
+     * @secure
+     */
+    deleteProduct: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/products/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags payment-controller
+     * @name GetPaymentById
+     * @request GET:/api/payments/{id}
+     * @secure
+     */
+    getPaymentById: (id: number, params: RequestParams = {}) =>
+      this.http.request<Payment, any>({
+        path: `/api/payments/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags payment-controller
+     * @name UpdatePayment
+     * @request PUT:/api/payments/{id}
+     * @secure
+     */
+    updatePayment: (id: number, data: Payment, params: RequestParams = {}) =>
+      this.http.request<Payment, any>({
+        path: `/api/payments/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags payment-controller
+     * @name DeletePayment
+     * @request DELETE:/api/payments/{id}
+     * @secure
+     */
+    deletePayment: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/payments/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-controller
+     * @name GetOrderById
+     * @request GET:/api/orders/{id}
+     * @secure
+     */
+    getOrderById: (id: number, params: RequestParams = {}) =>
+      this.http.request<Order, any>({
+        path: `/api/orders/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-controller
+     * @name UpdateOrder
+     * @request PUT:/api/orders/{id}
+     * @secure
+     */
+    updateOrder: (id: number, data: Order, params: RequestParams = {}) =>
+      this.http.request<Order, any>({
+        path: `/api/orders/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-controller
+     * @name DeleteOrder
+     * @request DELETE:/api/orders/{id}
+     * @secure
+     */
+    deleteOrder: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/orders/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-detail-controller
+     * @name GetOrderDetailById
+     * @request GET:/api/order-details/{id}
+     * @secure
+     */
+    getOrderDetailById: (id: number, params: RequestParams = {}) =>
+      this.http.request<OrderDetail, any>({
+        path: `/api/order-details/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-detail-controller
+     * @name UpdateOrderDetail
+     * @request PUT:/api/order-details/{id}
+     * @secure
+     */
+    updateOrderDetail: (id: number, data: OrderDetail, params: RequestParams = {}) =>
+      this.http.request<OrderDetail, any>({
+        path: `/api/order-details/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-detail-controller
+     * @name DeleteOrderDetail
+     * @request DELETE:/api/order-details/{id}
+     * @secure
+     */
+    deleteOrderDetail: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/order-details/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags inventory-controller
+     * @name GetInventoryById
+     * @request GET:/api/inventories/{id}
+     * @secure
+     */
+    getInventoryById: (id: number, params: RequestParams = {}) =>
+      this.http.request<Inventory, any>({
+        path: `/api/inventories/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags inventory-controller
+     * @name UpdateInventory
+     * @request PUT:/api/inventories/{id}
+     * @secure
+     */
+    updateInventory: (id: number, data: Inventory, params: RequestParams = {}) =>
+      this.http.request<Inventory, any>({
+        path: `/api/inventories/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags inventory-controller
+     * @name DeleteInventory
+     * @request DELETE:/api/inventories/{id}
+     * @secure
+     */
+    deleteInventory: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/inventories/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags category-controller
+     * @name GetCategoryById
+     * @request GET:/api/categories/{id}
+     * @secure
+     */
+    getCategoryById: (id: number, params: RequestParams = {}) =>
+      this.http.request<Category, any>({
+        path: `/api/categories/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags category-controller
+     * @name UpdateCategory
+     * @request PUT:/api/categories/{id}
+     * @secure
+     */
+    updateCategory: (id: number, data: Category, params: RequestParams = {}) =>
+      this.http.request<Category, any>({
+        path: `/api/categories/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags category-controller
+     * @name DeleteCategory
+     * @request DELETE:/api/categories/{id}
+     * @secure
+     */
+    deleteCategory: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/categories/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
+     * @name GetAllProducts
+     * @request GET:/api/products
+     * @secure
+     */
+    getAllProducts: (params: RequestParams = {}) =>
+      this.http.request<ProductDTO[], any>({
+        path: `/api/products`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
+     * @name CreateProduct
+     * @request POST:/api/products
+     * @secure
+     */
+    createProduct: (data: Product, params: RequestParams = {}) =>
+      this.http.request<Product, any>({
+        path: `/api/products`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags payment-controller
+     * @name GetAllPayments
+     * @request GET:/api/payments
+     * @secure
+     */
+    getAllPayments: (params: RequestParams = {}) =>
+      this.http.request<Payment[], any>({
+        path: `/api/payments`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags payment-controller
+     * @name CreatePayment
+     * @request POST:/api/payments
+     * @secure
+     */
+    createPayment: (data: Payment, params: RequestParams = {}) =>
+      this.http.request<Payment, any>({
+        path: `/api/payments`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-controller
+     * @name GetAllOrders
+     * @request GET:/api/orders
+     * @secure
+     */
+    getAllOrders: (params: RequestParams = {}) =>
+      this.http.request<Order[], any>({
+        path: `/api/orders`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-controller
+     * @name CreateOrder
+     * @request POST:/api/orders
+     * @secure
+     */
+    createOrder: (params: RequestParams = {}) =>
+      this.http.request<OrderDTO, any>({
+        path: `/api/orders`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-detail-controller
+     * @name GetAllOrderDetails
+     * @request GET:/api/order-details
+     * @secure
+     */
+    getAllOrderDetails: (params: RequestParams = {}) =>
+      this.http.request<OrderDetail[], any>({
+        path: `/api/order-details`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-detail-controller
+     * @name CreateOrderDetail
+     * @request POST:/api/order-details
+     * @secure
+     */
+    createOrderDetail: (data: OrderDetail, params: RequestParams = {}) =>
+      this.http.request<OrderDetail, any>({
+        path: `/api/order-details`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags inventory-controller
+     * @name GetAllInventories
+     * @request GET:/api/inventories
+     * @secure
+     */
+    getAllInventories: (params: RequestParams = {}) =>
+      this.http.request<Inventory[], any>({
+        path: `/api/inventories`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags inventory-controller
+     * @name CreateInventory
+     * @request POST:/api/inventories
+     * @secure
+     */
+    createInventory: (data: Inventory, params: RequestParams = {}) =>
+      this.http.request<Inventory, any>({
+        path: `/api/inventories`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags category-controller
+     * @name GetAllCategories
+     * @request GET:/api/categories
+     * @secure
+     */
+    getAllCategories: (params: RequestParams = {}) =>
+      this.http.request<Category[], any>({
+        path: `/api/categories`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags category-controller
+     * @name CreateCategory
+     * @request POST:/api/categories
+     * @secure
+     */
+    createCategory: (data: Category, params: RequestParams = {}) =>
+      this.http.request<Category, any>({
+        path: `/api/categories`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags cart-controller
+     * @name AddProductToCart
+     * @request POST:/api/cart/add
+     * @secure
+     */
+    addProductToCart: (
+      query: {
+        /** @format int64 */
+        productId: number;
+        /** @format int32 */
+        quantity: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.http.request<CartItemDTO, any>({
+        path: `/api/cart/add`,
+        method: "POST",
+        query: query,
         secure: true,
         ...params,
       }),
@@ -233,7 +888,7 @@ export class Api<SecurityDataType extends unknown> {
      * @request POST:/api/auth/register
      * @secure
      */
-    createNewUser: (data: User, params: RequestParams = {}) =>
+    createNewUser: (data: SignupRequestDTO, params: RequestParams = {}) =>
       this.http.request<User, any>({
         path: `/api/auth/register`,
         method: "POST",
@@ -266,12 +921,108 @@ export class Api<SecurityDataType extends unknown> {
      *
      * @tags user-controller
      * @name GetAllUsers
-     * @request GET:/api/v1/user
+     * @request GET:/api/user
      * @secure
      */
     getAllUsers: (params: RequestParams = {}) =>
       this.http.request<User[], any>({
-        path: `/api/v1/user`,
+        path: `/api/user`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
+     * @name GetProductsByCategory
+     * @request GET:/api/products/category/{categoryId}
+     * @secure
+     */
+    getProductsByCategory: (categoryId: number, params: RequestParams = {}) =>
+      this.http.request<Product[], any>({
+        path: `/api/products/category/${categoryId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags payment-controller
+     * @name GetPaymentByOrderId
+     * @request GET:/api/payments/order/{orderId}
+     * @secure
+     */
+    getPaymentByOrderId: (orderId: number, params: RequestParams = {}) =>
+      this.http.request<Payment, any>({
+        path: `/api/payments/order/${orderId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-controller
+     * @name GetOrdersByUserId
+     * @request GET:/api/orders/user/{userId}
+     * @secure
+     */
+    getOrdersByUserId: (userId: number, params: RequestParams = {}) =>
+      this.http.request<Order[], any>({
+        path: `/api/orders/user/${userId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-detail-controller
+     * @name GetOrderDetailsByOrder
+     * @request GET:/api/order-details/order/{orderId}
+     * @secure
+     */
+    getOrderDetailsByOrder: (orderId: number, params: RequestParams = {}) =>
+      this.http.request<OrderDetail[], any>({
+        path: `/api/order-details/order/${orderId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags inventory-controller
+     * @name GetInventoryByProductId
+     * @request GET:/api/inventories/product/{productId}
+     * @secure
+     */
+    getInventoryByProductId: (productId: number, params: RequestParams = {}) =>
+      this.http.request<Inventory, any>({
+        path: `/api/inventories/product/${productId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags cart-controller
+     * @name GetCart
+     * @request GET:/api/cart/
+     * @secure
+     */
+    getCart: (params: RequestParams = {}) =>
+      this.http.request<CartDTO, any>({
+        path: `/api/cart/`,
         method: "GET",
         secure: true,
         ...params,

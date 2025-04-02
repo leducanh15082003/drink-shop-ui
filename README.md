@@ -41,5 +41,5 @@ Run swagger and copy the doc to file `swagger-doc.json`
 And then run this in terminal:
 
 ```bash
-npx swagger-typescript-api -p .\swagger-doc.json -o .\src\services\ --axios --single-http-client
+npx swagger-typescript-api -p .\swagger-doc.json -o .\src\utils\services\ --axios --single-http-client
 ```
