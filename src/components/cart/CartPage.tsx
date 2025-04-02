@@ -1,27 +1,24 @@
 "use client";
 import QuantityButton from "@/app/menu/product-detail/components/QuantityButton";
-import { useCartStore } from "@/utils/store/cartStore";
+import { CartItem, useCartStore } from "@/utils/store/cartStore";
 import { CloseOutlined } from "@ant-design/icons";
-import { Button, Card, Table, Typography } from "antd";
+import { Button, Card, Table, TableProps, Typography } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import PaymentMethod from "./PaymentMethod";
 import { Coins, CreditCard } from "lucide-react";
 import clsx from "clsx";
+import { formatCurrency } from "@/utils/format/formatCurrency";
+import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
-    value
-  );
 
 const CartPage = () => {
   const { cart, removeFromCart, updateQuantity } = useCartStore();
   const [paymentMethod, setPaymentMethod] = React.useState("cash");
+  const route = useRouter();
 
-  const columns = [
+  const columns: TableProps<CartItem>["columns"] = [
     {
       title: "Product",
       dataIndex: "image",
@@ -135,6 +132,9 @@ const CartPage = () => {
               size="large"
               className="mt-4 rounded-lg"
               disabled={cart.length === 0}
+              onClick={() => {
+                route.push("/cart/checkout");
+              }}
             >
               Order now
             </Button>

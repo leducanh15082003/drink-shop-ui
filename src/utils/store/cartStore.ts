@@ -10,7 +10,7 @@ const getCartFromStorage = () => {
     return [];
   }
 };
-interface CartItem {
+export interface CartItem {
   id: number;
   image: string;
   name: string;
