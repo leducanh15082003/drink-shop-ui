@@ -30,9 +30,8 @@ const menuItems = [
   },
 ];
 
-const page = ({ params }: { params: { id: string } }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const id = params.id;
+const page = async ({ params }: { params: { id: string } }) => {
+  const { id } = await params; // {locale: "id"}
   return (
     <div className="bg-white p-12">
       <Breadcrumb
@@ -76,7 +75,7 @@ const page = ({ params }: { params: { id: string } }) => {
               </p>
             </div>
             <div className="h-[1px] bg-[#B6B6B6] w-[300px] my-5" />
-            <ProductOptions />
+            <ProductOptions productId={parseInt(id)} />
           </div>
         </div>
         {/* Product Detail */}

@@ -1,47 +1,25 @@
 "use client";
-import React, { useState } from "react";
+import { useCartStore } from "@/utils/store/cartStore";
+import React from "react";
+import { useForm } from "react-hook-form";
+import QuantityButton from "./QuantityButton";
 
-const OptionButton = ({
-  name,
-  disable,
-}: {
-  name: string;
-  disable?: boolean;
-}) => (
-  <button
-    className="font-poppins font-medium text-[16px] hover:bg-black hover:text-white transition-all ease-linear bg-[#D9D9D9] rounded-sm py-1 px-6 disabled:border-[1px] disabled:border-[#D9D9D9] disabled:bg-transparent disabled:text-[#D9D9D9]"
-    disabled={disable}
-  >
-    {name}
-  </button>
-);
-
-type Option = {
-  label: string;
-  options: { name: string; disable?: boolean }[];
+const sizePrices = {
+  S: 50000,
+  M: 55000,
+  L: 60000,
+  XL: 65000,
 };
 
-const options: Option[] = [
+const options = [
   {
     label: "Size",
-    options: [
-      {
-        name: "S",
-      },
-      {
-        name: "M",
-      },
-      {
-        name: "L",
-      },
-      {
-        name: "XL",
-        disable: true,
-      },
-    ],
+    name: "size",
+    options: Object.keys(sizePrices).map((size) => ({ name: size })),
   },
   {
     label: "Sugar",
+    name: "sugar",
     options: [
       { name: "30%" },
       { name: "50%" },
@@ -51,6 +29,7 @@ const options: Option[] = [
   },
   {
     label: "Ice",
+    name: "ice",
     options: [
       { name: "30%" },
       { name: "50%" },
@@ -60,48 +39,73 @@ const options: Option[] = [
   },
 ];
 
-const ProductOptions = () => {
-  const [quantity, setQuantity] = useState(1);
+const ProductOptions = ({ productId }: { productId: number }) => {
+  const { watch, setValue } = useForm({
+    defaultValues: {
+      size: "S",
+      sugar: "100%",
+      ice: "100%",
+      quantity: 1,
+    },
+  });
+
+  const { addToCart, cart } = useCartStore();
+
+  const selectedSize = watch("size");
+  const quantity = watch("quantity");
+  const price = sizePrices[selectedSize as keyof typeof sizePrices] * quantity;
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: productId,
+      image: "/images/menu/FriedEggs.png",
+      name: "Fried Eggs",
+      price: sizePrices[selectedSize as keyof typeof sizePrices],
+      quantity: quantity,
+      size: selectedSize as string,
+      sugar: watch("sugar"),
+      ice: watch("ice"),
+    });
+  };
+
+  console.log(cart);
+
   return (
     <div className="space-y-7">
       <div className="space-y-4">
-        {options.map((o, index) => (
-          <div key={index}>
-            <p className="font-poppins font-medium text-[20px] mb-2">
-              {o.label}
-            </p>
+        {options.map((o) => (
+          <div key={o.name}>
+            <p className="font-medium text-[20px] mb-2">{o.label}</p>
             <div className="flex gap-5">
-              {o.options.map((op, index) => (
-                <OptionButton key={index} name={op.name} disable={op.disable} />
+              {o.options.map((op) => (
+                <button
+                  key={op.name}
+                  type="button"
+                  className={`py-1 px-6 rounded-sm transition-all ${watch(o.name as "size" | "sugar" | "ice" | "quantity") === op.name ? "bg-black text-white" : "bg-gray-300"}`}
+                  onClick={() =>
+                    setValue(
+                      o.name as "size" | "sugar" | "ice" | "quantity",
+                      op.name
+                    )
+                  }
+                >
+                  {op.name}
+                </button>
               ))}
             </div>
           </div>
         ))}
       </div>
-      <div className="flex gap-5">
-        <div className="rounded-3xl bg-[#F4F4F4] px-4 py-2 w-fit flex gap-3 font-normal">
-          <button
-            className="disabled:text-[#00000080]"
-            disabled={quantity < 1}
-            onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 0)}
-          >
-            -
-          </button>
-          <input
-            type="number"
-            value={quantity}
-            onChange={(e) => {
-              const value =
-                parseInt(e.target.value) < 0 ? 0 : parseInt(e.target.value);
-              setQuantity(isNaN(value) ? 0 : value);
-            }}
-            className="text-[16px] w-10 bg-transparent text-center"
-          />
-          <button onClick={() => setQuantity(quantity + 1)}>+</button>
-        </div>
-
-        <button className="rounded-3xl bg-black text-white px-4 py-2 w-fit flex gap-3 font-normal">
-          + Add to cart
+      <div className="flex gap-5 items-center">
+        <QuantityButton
+          onChange={(value) => setValue("quantity", value)}
+          value={quantity}
+        />
+        <button
+          onClick={handleAddToCart}
+          className="bg-black text-white px-4 py-2 rounded-xl"
+        >
+          + Add to cart ({price.toLocaleString()}đ)
         </button>
       </div>
     </div>

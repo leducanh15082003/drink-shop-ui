@@ -1,0 +1,148 @@
+"use client";
+import QuantityButton from "@/app/menu/product-detail/components/QuantityButton";
+import { useCartStore } from "@/utils/store/cartStore";
+import { CloseOutlined } from "@ant-design/icons";
+import { Button, Card, Table, Typography } from "antd";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
+import PaymentMethod from "./PaymentMethod";
+import { Coins, CreditCard } from "lucide-react";
+import clsx from "clsx";
+
+const { Title, Text } = Typography;
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+    value
+  );
+
+const CartPage = () => {
+  const { cart, removeFromCart, updateQuantity } = useCartStore();
+  const [paymentMethod, setPaymentMethod] = React.useState("cash");
+
+  const columns = [
+    {
+      title: "Product",
+      dataIndex: "image",
+      render: (_, record) => (
+        <div className="flex gap-4 items-center">
+          <Image src={record.image} width={100} height={100} alt="" />
+          <Link href={`/menu/product-detail/${record.id}`}>
+            <Text strong>
+              {record.name} ({record.size} - {`${record.sugar} Sugar`} -
+              {`${record.ice} Ice`})
+            </Text>
+          </Link>
+        </div>
+      ),
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      render: (_, record) => (
+        <QuantityButton
+          key={record.id}
+          onChange={(value) => updateQuantity(record.id, value)}
+          value={record.quantity}
+        />
+      ),
+    },
+    {
+      title: "Total Price",
+      align: "right",
+      render: (_, record) => (
+        <Text>{formatCurrency(record.price * record.quantity)}</Text>
+      ),
+    },
+    {
+      title: "",
+      align: "center",
+      render: (_, record) => (
+        <Button
+          key={record.id}
+          type="text"
+          danger
+          onClick={() => removeFromCart(record.id)}
+        >
+          <CloseOutlined />
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <div className="p-16 bg-white mx-auto">
+      <Title level={2}>Shopping Cart</Title>
+
+      <div className="flex gap-4 mt-10">
+        <Table
+          className="w-4/5"
+          rowKey="id"
+          columns={columns}
+          dataSource={cart}
+          pagination={false}
+          summary={() => (
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0} />
+              <Table.Summary.Cell index={1}>
+                <Text strong>Total:</Text>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={0} align="right">
+                <Text strong type="success">
+                  {formatCurrency(
+                    cart.reduce(
+                      (acc, item) => acc + item.price * item.quantity,
+                      0
+                    )
+                  )}
+                </Text>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={0} />
+            </Table.Summary.Row>
+          )}
+        />
+
+        <Card className="w-1/4 rounded-lg">
+          <div className="flex flex-col justify-between items-stretch gap-4">
+            <Title level={3}>Pay by</Title>
+
+            <div className="flex flex-col gap-4">
+              <Button
+                onClick={() => setPaymentMethod("cash")}
+                size="large"
+                className={clsx(
+                  "rounded-lg",
+                  paymentMethod === "cash" && "bg-red-100"
+                )}
+              >
+                <Coins /> Cash
+              </Button>
+              <Button
+                onClick={() => setPaymentMethod("bank")}
+                size="large"
+                className={clsx(
+                  "rounded-lg",
+                  paymentMethod === "bank" && "bg-red-100"
+                )}
+              >
+                <CreditCard /> Bank Transfer
+              </Button>
+            </div>
+
+            <Button
+              type="primary"
+              size="large"
+              className="mt-4 rounded-lg"
+              disabled={cart.length === 0}
+            >
+              Order now
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default CartPage;
