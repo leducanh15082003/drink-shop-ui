@@ -1,20 +1,29 @@
 "use client";
 
-import { Form, Input, Button, Checkbox, message } from "antd";
+import { Form, Input, Button, Checkbox } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { htcService } from "@/utils/services/htcService";
 
+interface SignupFormProps {
+  fullName: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 export default function SignupForm() {
   const [form] = Form.useForm();
   const router = useRouter();
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: SignupFormProps) => {
     console.log("Signup Data:", values);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...registrationData } = values;
     try {
-      const {data} = await htcService.api.createNewUser(values);
+      await htcService.api.createNewUser(registrationData);
       toast.success("Register Succesfully!");
       router.push("/signin");
     } catch (error) {
@@ -34,7 +43,7 @@ export default function SignupForm() {
       {/* Name */}
       <Form.Item
         label="Full Name"
-        name="name"
+        name="fullName"
         rules={[{ required: true, message: "Please enter your full name" }]}
       >
         <Input />
@@ -58,7 +67,7 @@ export default function SignupForm() {
       {/* Email */}
       <Form.Item
         label="Email address"
-        name="userName"
+        name="email"
         rules={[
           { required: true, message: "Please enter your email" },
           { type: "email", message: "Email is invalid" },

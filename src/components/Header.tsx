@@ -1,9 +1,64 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useState, useEffect } from "react";
 import NavBar from "@/components/ui/nav-bar";
+import { Button, Flex, Dropdown, MenuProps } from "antd";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [fullName, setFullName] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      const fullName = localStorage.getItem("fullName");
+      setIsAuthenticated(!!token);
+      setFullName(fullName);
+    };
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+    router.push("/signin");
+  };
+
+  const truncatedFullName =
+    fullName && fullName.length > 4
+      ? `${fullName.substring(0, 4)}...`
+      : fullName;
+
+  const items: MenuProps["items"] = [
+    {
+      key: "fullName",
+      label: <div className="cursor-default hover:none">{fullName}</div>,
+    },
+    {
+      key: "profile",
+      label: (
+        <div onClick={() => router.push("/profile")} className="cursor-pointer">
+          Thông tin cá nhân
+        </div>
+      ),
+    },
+    {
+      key: "logout",
+      label: (
+        <div onClick={handleLogout} className="cursor-pointer text-red-500">
+          Đăng xuất
+        </div>
+      ),
+    },
+  ];
+
   return (
     <header className="sticky top-0 bg-white h-[90px] flex flex-col z-50 shadow-sm justify-center font-sans font-medium">
       <div className="flex justify-end items-center gap-12 pr-14">
@@ -129,10 +184,32 @@ export default function Header() {
             </svg>
           </div>
           <div className="pl-4 relative flex flex-col items-center cursor-pointer">
-            <div className="h-9 w-9">
-              <img src="/images/avatar.png" alt="" className="object-cover" />
-            </div>
-            <span className="absolute text-xs -bottom-[18px]">Adam</span>
+            {isAuthenticated ? (
+              <Dropdown menu={{ items }} trigger={["click"]}>
+                <div>
+                  <div className="h-9 w-9">
+                    <img
+                      src="/images/avatar.png"
+                      alt="User Avatar"
+                      className="object-cover"
+                    />
+                  </div>
+                  <span className="absolute text-xs -bottom-[18px]">
+                    {truncatedFullName || "User"}
+                  </span>
+                </div>
+              </Dropdown>
+            ) : (
+              <Flex gap="small" wrap>
+                <Button
+                  type="primary"
+                  className="rounded-md"
+                  onClick={() => router.push("/signin")}
+                >
+                  Log In
+                </Button>
+              </Flex>
+            )}
           </div>
         </div>
       </div>
