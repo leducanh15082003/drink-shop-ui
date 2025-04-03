@@ -90,6 +90,22 @@ export interface Product {
   inventory?: Inventory;
 }
 
+export interface CartItemDTO {
+  /** @format int64 */
+  productId?: number;
+  productName?: string;
+  /** @format int32 */
+  quantity?: number;
+  /** @format double */
+  unitPrice?: number;
+}
+
+export interface OrderRequest {
+  items?: CartItemDTO[];
+  /** @format double */
+  totalPrice?: number;
+}
+
 export interface OrderDTO {
   /** @format int64 */
   id?: number;
@@ -104,22 +120,7 @@ export interface OrderDTO {
 
 export interface OrderDetailsDTO {
   /** @format int64 */
-  id?: number;
-  /** @format int64 */
   productId?: number;
-  productName?: string;
-  /** @format int32 */
-  quantity?: number;
-  /** @format double */
-  unitPrice?: number;
-}
-
-export interface CartItemDTO {
-  /** @format int64 */
-  id?: number;
-  /** @format int64 */
-  productId?: number;
-  productName?: string;
   /** @format int32 */
   quantity?: number;
   /** @format double */
@@ -147,6 +148,7 @@ export interface ProductDTO {
   description?: string;
   image?: string;
   ingredients?: string;
+  category?: string;
 }
 
 export interface CategoryDTO {
@@ -732,31 +734,17 @@ export class Api<SecurityDataType extends unknown> {
      * No description
      *
      * @tags order-controller
-     * @name GetAllOrders
-     * @request GET:/api/orders
+     * @name Checkout
+     * @request POST:/api/orders/checkout
      * @secure
      */
-    getAllOrders: (params: RequestParams = {}) =>
-      this.http.request<Order[], any>({
-        path: `/api/orders`,
-        method: "GET",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags order-controller
-     * @name CreateOrder
-     * @request POST:/api/orders
-     * @secure
-     */
-    createOrder: (params: RequestParams = {}) =>
+    checkout: (data: OrderRequest, params: RequestParams = {}) =>
       this.http.request<OrderDTO, any>({
-        path: `/api/orders`,
+        path: `/api/orders/checkout`,
         method: "POST",
+        body: data,
         secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 
@@ -966,6 +954,22 @@ export class Api<SecurityDataType extends unknown> {
     getPaymentByOrderId: (orderId: number, params: RequestParams = {}) =>
       this.http.request<Payment, any>({
         path: `/api/payments/order/${orderId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags order-controller
+     * @name GetAllOrders
+     * @request GET:/api/orders
+     * @secure
+     */
+    getAllOrders: (params: RequestParams = {}) =>
+      this.http.request<Order[], any>({
+        path: `/api/orders`,
         method: "GET",
         secure: true,
         ...params,

@@ -15,7 +15,7 @@ const { Title, Text } = Typography;
 
 const CartPage = () => {
   const { cart, removeFromCart, updateQuantity } = useCartStore();
-  const [paymentMethod, setPaymentMethod] = React.useState("cash");
+  const [paymentMethod, setPaymentMethod] = React.useState("Cash");
   const route = useRouter();
 
   const columns: TableProps<CartItem>["columns"] = [
@@ -106,21 +106,21 @@ const CartPage = () => {
 
             <div className="flex flex-col gap-4">
               <Button
-                onClick={() => setPaymentMethod("cash")}
+                onClick={() => setPaymentMethod("Cash")}
                 size="large"
                 className={clsx(
                   "rounded-lg",
-                  paymentMethod === "cash" && "bg-red-100"
+                  paymentMethod === "Cash" && "bg-red-100"
                 )}
               >
                 <Coins /> Cash
               </Button>
               <Button
-                onClick={() => setPaymentMethod("bank")}
+                onClick={() => setPaymentMethod("Banking")}
                 size="large"
                 className={clsx(
                   "rounded-lg",
-                  paymentMethod === "bank" && "bg-red-100"
+                  paymentMethod === "Banking" && "bg-red-100"
                 )}
               >
                 <CreditCard /> Bank Transfer
@@ -133,7 +133,7 @@ const CartPage = () => {
               className="mt-4 rounded-lg"
               disabled={cart.length === 0}
               onClick={() => {
-                route.push("/cart/checkout");
+                route.push(`/cart/checkout?paymentMethod=${paymentMethod}`);
               }}
             >
               Order now

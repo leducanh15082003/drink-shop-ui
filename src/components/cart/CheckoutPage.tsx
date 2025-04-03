@@ -1,15 +1,60 @@
 "use client";
+import { htcService } from "@/utils/services/htcService";
 import { CartItem, useCartStore } from "@/utils/store/cartStore";
 import { Card, Divider, Select } from "antd";
 import Title from "antd/es/typography/Title";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const CheckoutPage = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
-  const { cart } = useCartStore();
+  const { cart, clearCart, getTotalPrice } = useCartStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const paymentMethodFromQuery = queryParams.get("paymentMethod");
+    if (paymentMethodFromQuery) {
+      setPaymentMethod(paymentMethodFromQuery);
+    }
+  }, []);
+
+  const handleConfirmOrder = async () => {
+    if (cart.length === 0) {
+      toast.info("Cart is empty!");
+      return;
+    }
+    if (!phone || !address) {
+      toast.info("Please enter phone number and your location!");
+      return;
+    }
+    const orderData = {
+      phone,
+      address,
+      paymentMethod,
+      items: cart.map((item: CartItem) => ({
+        productId: item.id,
+        productName: item.name,
+        quantity: item.quantity,
+        unitPrice: item.price,
+      })),
+      totalPrice: getTotalPrice(),
+    };
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await htcService.api.checkout(orderData);
+      toast.success("Order successfully!");
+      clearCart();
+      router.push("/");
+    } catch (e) {
+      console.error("Fail while ordering!", e);
+      toast.error("Fail while ordering, please try again");
+    }
+  };
 
   return (
     <div className="bg-white p-16">
@@ -74,26 +119,26 @@ const CheckoutPage = () => {
                     <span className="font-medium text-gray-700">
                       Chủ tài khoản:
                     </span>{" "}
-                    Nguyen Quang Tu
+                    Le Duc Anh
                   </p>
                   <p className="text-gray-600">
                     <span className="font-medium text-gray-700">
                       Ngân hàng:
                     </span>{" "}
-                    MB Bank
+                    Techcombank
                   </p>
                   <p className="text-gray-600">
                     <span className="font-medium text-gray-700">
                       Số tài khoản:
                     </span>{" "}
-                    0965037791
+                    1508230703
                   </p>
                 </div>
 
                 {/* Cột 2: QR Code */}
                 <div className="flex flex-1 flex-col items-center">
                   <Image
-                    src="/images/qr-code.png"
+                    src="/images/qr-code.jpg"
                     width={180}
                     height={180}
                     alt="QR Code"
@@ -102,7 +147,10 @@ const CheckoutPage = () => {
                 </div>
               </div>
             )}
-            <button className="mt-4 px-4 font-semibold bg-black text-white rounded-xl py-3 w-full">
+            <button
+              onClick={handleConfirmOrder}
+              className="mt-4 px-4 font-semibold bg-black text-white rounded-xl py-3 w-full"
+            >
               {paymentMethod === "Cash"
                 ? "Confirm Order"
                 : "Proceed to Payment"}

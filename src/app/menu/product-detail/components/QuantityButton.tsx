@@ -30,7 +30,7 @@ const QuantityButton = ({
         type="number"
         value={value}
         onChange={(e) => handleChange(Number(e.target.value))}
-        className="w-10 text-center bg-transparent"
+        className="w-10 text-center bg-transparent appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <button
         type="button"

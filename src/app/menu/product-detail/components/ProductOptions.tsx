@@ -4,18 +4,18 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import QuantityButton from "./QuantityButton";
 
-const sizePrices = {
-  S: 50000,
-  M: 55000,
-  L: 60000,
-  XL: 65000,
+const sizeIncrements = {
+  S: 0,
+  M: 5000,
+  L: 10000,
+  XL: 15000,
 };
 
 const options = [
   {
     label: "Size",
     name: "size",
-    options: Object.keys(sizePrices).map((size) => ({ name: size })),
+    options: Object.keys(sizeIncrements).map((size) => ({ name: size })),
   },
   {
     label: "Sugar",
@@ -39,7 +39,20 @@ const options = [
   },
 ];
 
-const ProductOptions = ({ productId }: { productId: number }) => {
+const ProductOptions = ({
+  productId,
+  productName,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  image,
+  basePrice,
+  category,
+}: {
+  productId: number;
+  productName: string;
+  image: string;
+  basePrice: number;
+  category: string;
+}) => {
   const { watch, setValue } = useForm({
     defaultValues: {
       size: "S",
@@ -53,14 +66,20 @@ const ProductOptions = ({ productId }: { productId: number }) => {
 
   const selectedSize = watch("size");
   const quantity = watch("quantity");
-  const price = sizePrices[selectedSize as keyof typeof sizePrices] * quantity;
+  const price =
+    (basePrice + sizeIncrements[selectedSize as keyof typeof sizeIncrements]) *
+    quantity;
+
+  const isDrink = category === "tea" || category === "coffee";
 
   const handleAddToCart = () => {
     addToCart({
       id: productId,
       image: "/images/menu/FriedEggs.png",
-      name: "Fried Eggs",
-      price: sizePrices[selectedSize as keyof typeof sizePrices],
+      // image: image,
+      name: productName,
+      price:
+        basePrice + sizeIncrements[selectedSize as keyof typeof sizeIncrements],
       quantity: quantity,
       size: selectedSize as string,
       sugar: watch("sugar"),
@@ -81,13 +100,17 @@ const ProductOptions = ({ productId }: { productId: number }) => {
                 <button
                   key={op.name}
                   type="button"
-                  className={`py-1 px-6 rounded-sm transition-all ${watch(o.name as "size" | "sugar" | "ice" | "quantity") === op.name ? "bg-black text-white" : "bg-gray-300"}`}
+                  className={`py-1 px-6 rounded-sm transition-all 
+                    ${watch(o.name as "size" | "sugar" | "ice" | "quantity") === op.name ? "bg-black text-white" : "bg-gray-300"}
+                    ${!isDrink ? "opacity-50 cursor-not-allowed" : ""}`}
                   onClick={() =>
+                    isDrink &&
                     setValue(
                       o.name as "size" | "sugar" | "ice" | "quantity",
                       op.name
                     )
                   }
+                  disabled={!isDrink}
                 >
                   {op.name}
                 </button>
