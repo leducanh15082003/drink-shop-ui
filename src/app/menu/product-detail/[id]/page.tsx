@@ -41,6 +41,7 @@ interface ProductDTO {
   description: string;
   image: string;
   ingredients: string;
+  category: string;
 }
 
 const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
@@ -118,7 +119,15 @@ const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
               </p>
             </div>
             <div className="h-[1px] bg-[#B6B6B6] w-[300px] my-5" />
-            <ProductOptions productId={productId ?? 0} />
+            {product && (
+              <ProductOptions
+                productId={product.id}
+                basePrice={product.price}
+                category={product.category.toLowerCase()}
+                productName={product.name}
+                image={product.image}
+              />
+            )}
           </div>
         </div>
         {/* Product Detail */}
