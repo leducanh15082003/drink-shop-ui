@@ -146,6 +146,13 @@ export interface ProductDTO {
   price?: number;
   description?: string;
   image?: string;
+  ingredients?: string;
+}
+
+export interface CategoryDTO {
+  /** @format int64 */
+  id?: number;
+  name?: string;
 }
 
 export interface CartDTO {
@@ -362,7 +369,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     getProductById: (id: number, params: RequestParams = {}) =>
-      this.http.request<Product, any>({
+      this.http.request<ProductDTO, any>({
         path: `/api/products/${id}`,
         method: "GET",
         secure: true,
@@ -830,7 +837,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     getAllCategories: (params: RequestParams = {}) =>
-      this.http.request<Category[], any>({
+      this.http.request<CategoryDTO[], any>({
         path: `/api/categories`,
         method: "GET",
         secure: true,
@@ -941,7 +948,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     getProductsByCategory: (categoryId: number, params: RequestParams = {}) =>
-      this.http.request<Product[], any>({
+      this.http.request<ProductDTO[], any>({
         path: `/api/products/category/${categoryId}`,
         method: "GET",
         secure: true,

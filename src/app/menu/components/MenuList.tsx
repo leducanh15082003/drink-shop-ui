@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MenuFilter from "./MenuFilter";
 import Menu from "@/components/Menu";
+import { htcService } from "@/utils/services/htcService";
 
 export interface MenuFilterType {
   type: string;
@@ -10,56 +11,18 @@ export interface MenuFilterType {
   maxPrice: number;
 }
 
-const menuItems = [
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Fried Eggs",
-    des: "Made with eggs, lettuce, salt, oil and other ingredients.",
-    price: "9.99",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Hawaiian Pizza",
-    des: "Made with tomato sauce, cheese, ham, pineapple.",
-    price: "15.99",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Martinez Cocktail",
-    des: "A classic gin-based cocktail with vermouth and bitters.",
-    price: "7.25",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Butterscotch Cake",
-    des: "A rich and moist cake with caramelized sugar and butter flavor.",
-    price: "20.99",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Fried Eggs",
-    des: "Made with eggs, lettuce, salt, oil and other ingredients.",
-    price: "9.99",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Hawaiian Pizza",
-    des: "Made with tomato sauce, cheese, ham, pineapple.",
-    price: "15.99",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Martinez Cocktail",
-    des: "A classic gin-based cocktail with vermouth and bitters.",
-    price: "7.25",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Butterscotch Cake",
-    des: "A rich and moist cake with caramelized sugar and butter flavor.",
-    price: "20.99",
-  },
-];
+interface ProductDTO {
+  id: number;
+  image: string;
+  name: string;
+  description: string;
+  price: number;
+}
+
+interface CategoryDTO {
+  id: number;
+  name: string;
+}
 
 const MenuList = () => {
   const [filter, setFilter] = useState<MenuFilterType>({
@@ -68,6 +31,52 @@ const MenuList = () => {
     minPrice: 0,
     maxPrice: 1000,
   });
+
+  const [menuItems, setMenuItems] = useState<ProductDTO[]>([]);
+  const [categories, setCategories] = useState<CategoryDTO[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await htcService.api.getAllCategories();
+        setCategories([
+          { id: 0, name: "all" },
+          ...(response.data as CategoryDTO[]),
+        ]);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        if (filter.type === "all") {
+          const response = await htcService.api.getAllProducts();
+          setMenuItems(response.data as ProductDTO[]);
+          console.log(response.data);
+        } else {
+          const selectedCategory = categories.find(
+            (c) => c.name === filter.type
+          );
+          if (selectedCategory) {
+            const response = await htcService.api.getProductsByCategory(
+              selectedCategory.id
+            );
+            setMenuItems(response.data as ProductDTO[]);
+          }
+        }
+      } catch (error) {
+        console.error("Error while fetching!: ", error);
+      }
+    };
+    if (categories.length > 0) {
+      fetchMenuItems();
+    }
+  }, [filter, categories]);
   return (
     <div className="flex flex-col justify-center items-center">
       <MenuFilter filter={filter} setFilter={setFilter} />
@@ -76,9 +85,9 @@ const MenuList = () => {
           <Menu
             id={index + 1}
             key={index}
-            imagePath={item.imagePath}
+            imagePath={item.image}
             name={item.name}
-            des={item.des}
+            des={item.description}
             price={item.price}
           />
         ))}

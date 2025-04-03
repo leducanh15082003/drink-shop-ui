@@ -39,6 +39,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${dmSans.variable} ${poppins.variable} ${playfair.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ConfigProvider
           theme={{
