@@ -8,7 +8,7 @@ interface MenuProps {
   imagePath: string;
   name: string;
   des: string;
-  price: string;
+  price: number;
 }
 
 const Menu: React.FC<MenuProps> = ({ imagePath, name, des, price, id }) => {
