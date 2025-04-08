@@ -60,7 +60,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </ConfigProvider>
-        <ToastContainer />
+        <ToastContainer position="bottom-right" />
       </body>
     </html>
   );
