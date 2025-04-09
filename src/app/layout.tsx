@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import { ConfigProvider } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "@/utils/context/AuthContext";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -41,25 +42,27 @@ export default function RootLayout({
         className={`${dmSans.variable} ${poppins.variable} ${playfair.variable} antialiased`}
         suppressHydrationWarning
       >
-        <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: "#AD343E",
-              borderRadius: 2,
-            },
-            components: {
-              Slider: {
-                controlHeight: 5,
-                railSize: 10,
-                borderRadiusXS: 10,
+        <AuthProvider>
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: "#AD343E",
+                borderRadius: 2,
               },
-            },
-          }}
-        >
-          <Header />
-          {children}
-          <Footer />
-        </ConfigProvider>
+              components: {
+                Slider: {
+                  controlHeight: 5,
+                  railSize: 10,
+                  borderRadiusXS: 10,
+                },
+              },
+            }}
+          >
+            <Header />
+            {children}
+            <Footer />
+          </ConfigProvider>
+        </AuthProvider>
         <ToastContainer position="bottom-right" />
       </body>
     </html>

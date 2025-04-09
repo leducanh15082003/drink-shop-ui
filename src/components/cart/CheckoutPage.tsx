@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/utils/context/AuthContext";
 import { htcService } from "@/utils/services/htcService";
 import { CartItem, useCartStore } from "@/utils/store/cartStore";
 import { Card, Divider, Select } from "antd";
@@ -9,11 +10,19 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const CheckoutPage = () => {
+  const { currentUser } = useAuth();
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const { cart, clearCart, getTotalPrice } = useCartStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!currentUser) {
+      router.push("/signin");
+    }
+    setPhone(currentUser?.phoneNumber || "");
+  }, [currentUser, router]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -79,7 +88,7 @@ const CheckoutPage = () => {
                   onChange={(e) => setPhone(e.target.value)}
                   type="text"
                   placeholder="Phone"
-                  className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full"
+                  className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full text-black"
                 />
               </div>
               <div className="flex gap-5 items-center">
@@ -89,7 +98,7 @@ const CheckoutPage = () => {
                   onChange={(e) => setAddress(e.target.value)}
                   type="text"
                   placeholder="Address"
-                  className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full"
+                  className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full text-black"
                 />
               </div>
             </div>

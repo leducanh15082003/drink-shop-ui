@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { htcService } from "@/utils/services/htcService";
 import { toast } from "react-toastify";
+import { useAuth } from "@/utils/context/AuthContext";
 
 interface LoginResponse {
   token: string;
@@ -14,6 +15,7 @@ interface LoginResponse {
 export default function SigninForm() {
   const [form] = Form.useForm();
   const router = useRouter();
+  const { login } = useAuth();
 
   const onFinish = async (values: { email: string; password: string }) => {
     try {
@@ -31,8 +33,7 @@ export default function SigninForm() {
         console.log("token: ", data.token);
         console.log("fullName: ", data.fullName);
         toast.success("Login successful!");
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("fullName", data.fullName);
+        login(data.token);
         window.dispatchEvent(new Event("storage"));
         router.push("/");
       } else {
