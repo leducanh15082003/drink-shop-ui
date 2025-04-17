@@ -1186,23 +1186,12 @@
         }
       }
     },
-    "/api/orders/user/{userId}": {
+    "/api/orders/user": {
       "get": {
         "tags": [
           "order-controller"
         ],
         "operationId": "getOrdersByUserId",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1211,7 +1200,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Order"
+                    "$ref": "#/components/schemas/OrderDTO"
                   }
                 }
               }
@@ -1375,6 +1364,21 @@
           },
           "payment": {
             "$ref": "#/components/schemas/Payment"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "address": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
           }
         }
       },
@@ -1398,6 +1402,15 @@
           "unitPrice": {
             "type": "number",
             "format": "double"
+          },
+          "size": {
+            "type": "string"
+          },
+          "sugarRate": {
+            "type": "string"
+          },
+          "iceRate": {
+            "type": "string"
           }
         }
       },
@@ -1531,6 +1544,15 @@
           "unitPrice": {
             "type": "number",
             "format": "double"
+          },
+          "size": {
+            "type": "string"
+          },
+          "sugarRate": {
+            "type": "string"
+          },
+          "iceRate": {
+            "type": "string"
           }
         }
       },
@@ -1546,6 +1568,15 @@
           "totalPrice": {
             "type": "number",
             "format": "double"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string"
           }
         }
       },
@@ -1568,20 +1599,46 @@
             "type": "string",
             "format": "date-time"
           },
+          "orderStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "payment": {
+            "$ref": "#/components/schemas/PaymentDTO"
+          },
           "orderDetails": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/OrderDetailsDTO"
             }
+          },
+          "address": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
           }
         }
       },
       "OrderDetailsDTO": {
         "type": "object",
         "properties": {
-          "productId": {
-            "type": "integer",
-            "format": "int64"
+          "productName": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "sugarRate": {
+            "type": "string"
+          },
+          "iceRate": {
+            "type": "string"
           },
           "quantity": {
             "type": "integer",
@@ -1590,6 +1647,25 @@
           "unitPrice": {
             "type": "number",
             "format": "double"
+          }
+        }
+      },
+      "PaymentDTO": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "transactionDate": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },

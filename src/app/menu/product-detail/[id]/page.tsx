@@ -13,24 +13,28 @@ const menuItems = [
     name: "Fried Eggs",
     des: "Made with eggs, lettuce, salt, oil and other ingredients.",
     price: 9.99,
+    category: "Breakfast",
   },
   {
     imagePath: "/images/menu/FriedEggs.png",
     name: "Hawaiian Pizza",
     des: "Made with tomato sauce, cheese, ham, pineapple.",
     price: 15.99,
+    category: "Breakfast",
   },
   {
     imagePath: "/images/menu/FriedEggs.png",
     name: "Martinez Cocktail",
     des: "A classic gin-based cocktail with vermouth and bitters.",
     price: 7.25,
+    category: "Breakfast",
   },
   {
     imagePath: "/images/menu/FriedEggs.png",
     name: "Butterscotch Cake",
     des: "A rich and moist cake with caramelized sugar and butter flavor.",
     price: 20.99,
+    category: "Breakfast",
   },
 ];
 
@@ -158,6 +162,7 @@ const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
               name={item.name}
               des={item.des}
               price={item.price}
+              category={item.category}
             />
           ))}
         </div>

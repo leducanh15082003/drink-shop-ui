@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/utils/context/AuthContext";
+import { CartItemDTO, OrderRequest } from "@/utils/services/Api";
 import { htcService } from "@/utils/services/htcService";
 import { CartItem, useCartStore } from "@/utils/store/cartStore";
 import { Card, Divider, Select } from "antd";
@@ -41,21 +42,28 @@ const CheckoutPage = () => {
       toast.info("Please enter phone number and your location!");
       return;
     }
-    const orderData = {
-      phone,
+    const orderData: OrderRequest = {
+      phoneNumber: phone,
       address,
       paymentMethod,
-      items: cart.map((item: CartItem) => ({
+      items: cart.map<CartItemDTO>((item: CartItem) => ({
         productId: item.id,
         productName: item.name,
         quantity: item.quantity,
         unitPrice: item.price,
+        size: item.size,
+        sugarRate: item.sugar,
+        iceRate: item.ice,
       })),
       totalPrice: getTotalPrice(),
     };
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const response = await htcService.api.checkout(orderData);
+      if (response.status !== 200) {
+        toast.error("Order failed!");
+        return;
+      }
       toast.success("Order successfully!");
       clearCart();
       router.push("/");

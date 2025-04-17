@@ -1,9 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import ProductOptions from "@/app/menu/product-detail/components/ProductOptions";
 import { htcService } from "@/utils/services/htcService";
-import { useCartStore } from "@/utils/store/cartStore";
+import { Modal } from "antd";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 interface MenuProps {
@@ -12,25 +14,19 @@ interface MenuProps {
   name: string;
   des: string;
   price: number;
+  category: string;
 }
 
-const Menu: React.FC<MenuProps> = ({ imagePath, name, des, price, id }) => {
+const Menu: React.FC<MenuProps> = ({
+  imagePath,
+  name,
+  des,
+  price,
+  id,
+  category,
+}) => {
+  const [openModal, setOpenModal] = useState(false);
   const route = useRouter();
-  const { addToCart } = useCartStore();
-
-  const handleAddToCart = () => {
-    addToCart({
-      ice: "100%",
-      id: id,
-      image: imagePath,
-      name: name,
-      price: price,
-      quantity: 1,
-      size: "M",
-      sugar: "100%",
-    });
-    toast.success("Add to cart successfully!");
-  };
 
   const handleAddToFavourite = async () => {
     try {
@@ -59,7 +55,7 @@ const Menu: React.FC<MenuProps> = ({ imagePath, name, des, price, id }) => {
         "M17 20.25C17 20.6642 16.6642 21 16.25 21C15.8358 21 15.5 20.6642 15.5 20.25C15.5 19.8358 15.8358 19.5 16.25 19.5C16.6642 19.5 17 19.8358 17 20.25Z",
         "M3.96562 6.75H20.7844L18.3094 15.4125C18.2211 15.7269 18.032 16.0036 17.7711 16.2C17.5103 16.3965 17.1922 16.5019 16.8656 16.5H7.88437C7.55783 16.5019 7.2397 16.3965 6.97886 16.2C6.71803 16.0036 6.52893 15.7269 6.44062 15.4125L3.04688 3.54375C3.00203 3.38696 2.9073 3.24905 2.77704 3.15093C2.64677 3.05282 2.48808 2.99983 2.325 3H0.75",
       ],
-      onClick: () => handleAddToCart(),
+      onClick: () => setOpenModal(true),
     },
     {
       label: "Xem chi tiết",
@@ -116,6 +112,21 @@ const Menu: React.FC<MenuProps> = ({ imagePath, name, des, price, id }) => {
           {des}
         </span>
       </div>
+      <Modal
+        open={openModal}
+        onCancel={() => setOpenModal(false)}
+        title={name}
+        footer={null}
+      >
+        <ProductOptions
+          basePrice={price}
+          productId={id}
+          productName={name}
+          category={category.toLowerCase()}
+          image={imagePath}
+          onClose={() => setOpenModal(false)}
+        />
+      </Modal>
     </div>
   );
 };

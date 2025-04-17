@@ -46,12 +46,14 @@ const ProductOptions = ({
   image,
   basePrice,
   category,
+  onClose,
 }: {
   productId: number;
   productName: string;
   image: string;
   basePrice: number;
   category: string;
+  onClose?: () => void;
 }) => {
   const { watch, setValue } = useForm({
     defaultValues: {
@@ -85,6 +87,10 @@ const ProductOptions = ({
       sugar: watch("sugar"),
       ice: watch("ice"),
     });
+
+    if (onClose) {
+      onClose();
+    }
   };
 
   console.log(cart);

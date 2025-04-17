@@ -3,20 +3,13 @@ import React, { useEffect, useState } from "react";
 import MenuFilter from "./MenuFilter";
 import Menu from "@/components/Menu";
 import { htcService } from "@/utils/services/htcService";
+import { ProductDTO } from "@/utils/services/Api";
 
 export interface MenuFilterType {
   type: string;
   search: string;
   minPrice: number;
   maxPrice: number;
-}
-
-interface ProductDTO {
-  id: number;
-  image: string;
-  name: string;
-  description: string;
-  price: number;
 }
 
 interface CategoryDTO {
@@ -85,10 +78,11 @@ const MenuList = () => {
           <Menu
             id={index + 1}
             key={index}
-            imagePath={item.image}
-            name={item.name}
-            des={item.description}
-            price={item.price}
+            imagePath={item.image as string}
+            name={item.name as string}
+            des={item.description as string}
+            price={item.price as number}
+            category={item.category as string}
           />
         ))}
       </div>

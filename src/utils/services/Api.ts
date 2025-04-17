@@ -37,6 +37,9 @@ export interface Order {
   orderTime?: string;
   orderDetails?: OrderDetail[];
   payment?: Payment;
+  status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED";
+  address?: string;
+  phoneNumber?: string;
 }
 
 export interface OrderDetail {
@@ -48,6 +51,9 @@ export interface OrderDetail {
   quantity?: number;
   /** @format double */
   unitPrice?: number;
+  size?: string;
+  sugarRate?: string;
+  iceRate?: string;
 }
 
 export interface Payment {
@@ -102,12 +108,18 @@ export interface CartItemDTO {
   quantity?: number;
   /** @format double */
   unitPrice?: number;
+  size?: string;
+  sugarRate?: string;
+  iceRate?: string;
 }
 
 export interface OrderRequest {
   items?: CartItemDTO[];
   /** @format double */
   totalPrice?: number;
+  address?: string;
+  phoneNumber?: string;
+  paymentMethod?: string;
 }
 
 export interface OrderDTO {
@@ -119,16 +131,31 @@ export interface OrderDTO {
   price?: number;
   /** @format date-time */
   orderTime?: string;
+  orderStatus?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED";
+  payment?: PaymentDTO;
   orderDetails?: OrderDetailsDTO[];
+  address?: string;
+  phoneNumber?: string;
 }
 
 export interface OrderDetailsDTO {
-  /** @format int64 */
-  productId?: number;
+  productName?: string;
+  size?: string;
+  sugarRate?: string;
+  iceRate?: string;
   /** @format int32 */
   quantity?: number;
   /** @format double */
   unitPrice?: number;
+}
+
+export interface PaymentDTO {
+  /** @format double */
+  amount?: number;
+  paymentMethod?: string;
+  status?: string;
+  /** @format date-time */
+  transactionDate?: string;
 }
 
 export interface SignupRequestDTO {
@@ -1052,12 +1079,12 @@ export class Api<SecurityDataType extends unknown> {
      *
      * @tags order-controller
      * @name GetOrdersByUserId
-     * @request GET:/api/orders/user/{userId}
+     * @request GET:/api/orders/user
      * @secure
      */
-    getOrdersByUserId: (userId: number, params: RequestParams = {}) =>
-      this.http.request<Order[], any>({
-        path: `/api/orders/user/${userId}`,
+    getOrdersByUserId: (params: RequestParams = {}) =>
+      this.http.request<OrderDTO[], any>({
+        path: `/api/orders/user`,
         method: "GET",
         secure: true,
         ...params,
