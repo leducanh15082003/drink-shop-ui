@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import ProductOptions from "@/app/menu/product-detail/components/ProductOptions";
+import ProductOptions from "@/app/(customer)/menu/product-detail/components/ProductOptions";
 import { htcService } from "@/utils/services/htcService";
 import { Modal } from "antd";
 import { useRouter } from "next/navigation";

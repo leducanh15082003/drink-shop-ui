@@ -1,5 +1,5 @@
 "use client";
-import QuantityButton from "@/app/menu/product-detail/components/QuantityButton";
+import QuantityButton from "@/app/(customer)/menu/product-detail/components/QuantityButton";
 import { CartItem, useCartStore } from "@/utils/store/cartStore";
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Card, Table, TableProps, Typography } from "antd";

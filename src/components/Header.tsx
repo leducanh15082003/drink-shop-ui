@@ -2,45 +2,16 @@
 "use client";
 
 import NavBar from "@/components/ui/nav-bar";
-import { Button, Flex, Dropdown, MenuProps } from "antd";
+import { Button, Flex } from "antd";
 import { useRouter } from "next/navigation";
 import CartIcon from "./cart/CartIcon";
 import { useAuth } from "@/utils/context/AuthContext";
 import FavoriteIcon from "./favorite/FavoriteIcon";
+import Avatar from "./Avatar";
 
 export default function Header() {
-  const { currentUser, isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
-
-  const truncatedFullName =
-    currentUser?.fullName && currentUser?.fullName.length > 4
-      ? `${currentUser?.fullName.substring(0, 4)}...`
-      : currentUser?.fullName;
-
-  const items: MenuProps["items"] = [
-    {
-      key: "fullName",
-      label: (
-        <div className="cursor-default hover:none">{currentUser?.email}</div>
-      ),
-    },
-    {
-      key: "profile",
-      label: (
-        <div onClick={() => router.push("/profile")} className="cursor-pointer">
-          Thông tin cá nhân
-        </div>
-      ),
-    },
-    {
-      key: "logout",
-      label: (
-        <div onClick={logout} className="cursor-pointer text-red-500">
-          Đăng xuất
-        </div>
-      ),
-    },
-  ];
 
   return (
     <header className="sticky top-0 bg-white h-[90px] flex flex-col z-50 shadow-sm justify-center font-sans font-medium">
@@ -115,20 +86,7 @@ export default function Header() {
           </div>
           <div className="pl-4 relative flex flex-col items-center cursor-pointer">
             {isAuthenticated ? (
-              <Dropdown menu={{ items }} trigger={["click"]}>
-                <div>
-                  <div className="h-9 w-9">
-                    <img
-                      src="/images/avatar.png"
-                      alt="User Avatar"
-                      className="object-cover"
-                    />
-                  </div>
-                  <span className="absolute text-black text-xs -bottom-[18px]">
-                    {truncatedFullName || "User"}
-                  </span>
-                </div>
-              </Dropdown>
+              <Avatar />
             ) : (
               <Flex gap="small" wrap>
                 <Button
