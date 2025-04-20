@@ -704,7 +704,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Product"
+                  "type": "object"
                 }
               }
             }
@@ -1014,7 +1014,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "type": "object"
                 }
               }
             }

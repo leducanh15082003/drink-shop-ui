@@ -23,9 +23,14 @@ export default function SignupForm() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...registrationData } = values;
     try {
-      await htcService.api.createNewUser(registrationData);
-      toast.success("Register Succesfully!");
-      router.push("/signin");
+      const response = await htcService.api.createNewUser(registrationData);
+      console.log(response);
+      if (response?.status == 200) {
+        toast.success("Register Succesfully!");
+        router.push("/signin");
+      } else {
+        toast.error("Email already exists!");
+      }
     } catch (error) {
       console.error("Error during registration:", error);
       toast.error("Register Failed!");
@@ -80,7 +85,10 @@ export default function SignupForm() {
       <Form.Item
         label="Password"
         name="password"
-        rules={[{ required: true, message: "Please enter your password" }]}
+        rules={[
+          { required: true, message: "Please enter your password" },
+          { min: 8, message: "Password must be at least 8 characters" },
+        ]}
       >
         <Input.Password placeholder="8+ characters" />
       </Form.Item>
@@ -92,6 +100,7 @@ export default function SignupForm() {
         dependencies={["password"]}
         rules={[
           { required: true, message: "Please confirm your password" },
+          { min: 8, message: "Password must be at least 8 characters" },
           ({ getFieldValue }) => ({
             validator(_, value) {
               if (!value || getFieldValue("password") === value) {

@@ -10,11 +10,12 @@ const getCartFromStorage = () => {
     return [];
   }
 };
+
 export interface CartItem {
   id: number;
   image: string;
   name: string;
-  price: number; // Giá mỗi đơn vị sản phẩm
+  price: number;
   size: string;
   sugar: string;
   ice: string;
@@ -24,46 +25,56 @@ export interface CartItem {
 interface CartState {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: number) => void;
+  removeFromCart: (item: CartItem) => void;
   clearCart: () => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  updateQuantity: (item: CartItem, quantity: number) => void;
   getTotalPrice: () => number;
 }
 
+const isSameItem = (a: CartItem, b: CartItem) =>
+  a.id === b.id && a.size === b.size && a.sugar === b.sugar && a.ice === b.ice;
+
 export const useCartStore = create<CartState>((set, get) => ({
-  cart: getCartFromStorage(), // Load cart khi khởi động
+  cart: getCartFromStorage(),
+
   addToCart: (item) =>
     set((state) => {
-      const existingItem = state.cart.find((i) => i.id === item.id);
+      const existingItem = state.cart.find((i) => isSameItem(i, item));
       let newCart;
       if (existingItem) {
         newCart = state.cart.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+          isSameItem(i, item)
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
         );
       } else {
         newCart = [...state.cart, item];
       }
-      localStorage.setItem("cart", JSON.stringify(newCart)); // Lưu vào localStorage
-      return { cart: newCart };
-    }),
-  removeFromCart: (id) =>
-    set((state) => {
-      const newCart = state.cart.filter((item) => item.id !== id);
       localStorage.setItem("cart", JSON.stringify(newCart));
       return { cart: newCart };
     }),
+
+  removeFromCart: (item) =>
+    set((state) => {
+      const newCart = state.cart.filter((i) => !isSameItem(i, item));
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return { cart: newCart };
+    }),
+
   clearCart: () => {
     localStorage.removeItem("cart");
     set({ cart: [] });
   },
-  updateQuantity: (id, quantity) =>
+
+  updateQuantity: (item, quantity) =>
     set((state) => {
-      const newCart = state.cart.map((item) =>
-        item.id === id ? { ...item, quantity } : item
+      const newCart = state.cart.map((i) =>
+        isSameItem(i, item) ? { ...i, quantity } : i
       );
       localStorage.setItem("cart", JSON.stringify(newCart));
       return { cart: newCart };
     }),
+
   getTotalPrice: () =>
     get().cart.reduce((total, item) => total + item.price * item.quantity, 0),
 }));

@@ -18,6 +18,8 @@ const CartPage = () => {
   const [paymentMethod, setPaymentMethod] = React.useState("Cash");
   const route = useRouter();
 
+  console.log(cart);
+
   const columns: TableProps<CartItem>["columns"] = [
     {
       title: "Product",
@@ -40,7 +42,7 @@ const CartPage = () => {
       render: (_, record) => (
         <QuantityButton
           key={record.id}
-          onChange={(value) => updateQuantity(record.id, value)}
+          onChange={(value) => updateQuantity(record, value)}
           value={record.quantity}
         />
       ),
@@ -60,7 +62,7 @@ const CartPage = () => {
           key={record.id}
           type="text"
           danger
-          onClick={() => removeFromCart(record.id)}
+          onClick={() => removeFromCart(record)}
         >
           <CloseOutlined />
         </Button>
@@ -75,7 +77,9 @@ const CartPage = () => {
       <div className="flex gap-4 mt-10">
         <Table
           className="w-4/5"
-          rowKey="id"
+          rowKey={(record) =>
+            record.id + record.size + record.sugar + record.ice
+          }
           columns={columns}
           dataSource={cart}
           pagination={false}

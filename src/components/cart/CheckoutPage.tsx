@@ -175,7 +175,10 @@ const CheckoutPage = () => {
           </div>
           <Card className="w-1/4 rounded-2xl shadow-md p-0">
             {cart.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id + product.size + product.sugar + product.ice}
+                product={product}
+              />
             ))}
           </Card>
         </div>

@@ -122,7 +122,7 @@ const Menu: React.FC<MenuProps> = ({
           basePrice={price}
           productId={id}
           productName={name}
-          category={category.toLowerCase()}
+          category={category?.toLowerCase()}
           image={imagePath}
           onClose={() => setOpenModal(false)}
         />

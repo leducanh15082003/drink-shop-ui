@@ -127,7 +127,7 @@ const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
               <ProductOptions
                 productId={product.id}
                 basePrice={product.price}
-                category={product.category.toLowerCase()}
+                category={product.category?.toLowerCase()}
                 productName={product.name}
                 image={product.image}
               />

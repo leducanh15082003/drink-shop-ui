@@ -1,16 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, Select } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Upload,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { htcService } from "@/utils/services/htcService";
 import { CategoryDTO, ProductDTO } from "@/utils/services/Api";
 import TextArea from "antd/es/input/TextArea";
 import { toast } from "react-toastify";
+import { supabase } from "@/utils/lib/supabase";
 
 export default function ProductTable() {
   const [products, setProducts] = useState<ProductDTO[]>();
   const [categories, setCategories] = useState<CategoryDTO[]>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [lastUploadedPath, setLastUploadedPath] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -83,6 +95,17 @@ export default function ProductTable() {
     });
   };
 
+  const handleCancel = async () => {
+    if (lastUploadedPath) {
+      await supabase.storage.from("drinkshop").remove([lastUploadedPath]);
+      setLastUploadedPath(null);
+    }
+
+    setImagePreview(null);
+    form.resetFields();
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
@@ -103,7 +126,7 @@ export default function ProductTable() {
         title="Add New Product"
         open={isModalOpen}
         onOk={handleOk}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={handleCancel}
         okText="Add"
         style={{ top: 20 }}
       >
@@ -138,12 +161,71 @@ export default function ProductTable() {
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="image"
-            label="Image URL"
-            rules={[{ required: true }]}
-          >
-            <Input placeholder="/images/menu/image.png" />
+          <Form.Item label="Product Image">
+            <div style={{ textAlign: "center" }}>
+              <Upload
+                showUploadList={false}
+                beforeUpload={async (file) => {
+                  if (lastUploadedPath) {
+                    await supabase.storage
+                      .from("drinkshop")
+                      .remove([lastUploadedPath]);
+                    setLastUploadedPath(null);
+                  }
+
+                  const { data, error } = await supabase.storage
+                    .from("drinkshop")
+                    .upload(`temp/${Date.now()}-${file.name}`, file);
+
+                  if (error) {
+                    toast.error("Upload failed!");
+                    return Upload.LIST_IGNORE;
+                  }
+
+                  const url = supabase.storage
+                    .from("drinkshop")
+                    .getPublicUrl(data.path).data.publicUrl;
+
+                  form.setFieldsValue({ image: url });
+                  setImagePreview(url); // state dùng để hiển thị ảnh preview
+                  setLastUploadedPath(data.path); // Lưu lại path mới
+
+                  return false; // không upload bằng antd, mình tự handle
+                }}
+              >
+                <div
+                  style={{
+                    width: 150,
+                    height: 150,
+                    border: "1px dashed #d9d9d9",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: 8,
+                      }}
+                    />
+                  ) : (
+                    <span>Click to Upload</span>
+                  )}
+                </div>
+              </Upload>
+            </div>
+          </Form.Item>
+
+          <Form.Item name="image" noStyle rules={[{ required: true }]}>
+            <Input type="hidden" />
           </Form.Item>
         </Form>
       </Modal>

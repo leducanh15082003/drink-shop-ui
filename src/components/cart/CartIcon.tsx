@@ -1,6 +1,6 @@
 import { useCartStore } from "@/utils/store/cartStore";
 import { Badge } from "antd";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const CartIconSvg = () => (
@@ -47,12 +47,15 @@ const CartIconSvg = () => (
 
 const CartIcon = () => {
   const { cart } = useCartStore();
+  const router = useRouter();
   return (
-    <Link href="/cart">
-      <Badge count={cart.length} size="small">
-        <CartIconSvg />
-      </Badge>
-    </Link>
+    <Badge
+      onClick={() => router.push("/cart")}
+      count={cart.length}
+      size="small"
+    >
+      <CartIconSvg />
+    </Badge>
   );
 };
 
