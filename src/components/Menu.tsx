@@ -67,12 +67,12 @@ const Menu: React.FC<MenuProps> = ({
     },
   ];
   return (
-    <div className="w-[300px] border-[2px] rounded-lg border-[#DBDFD0] overflow-hidden flex flex-col items-center group">
-      <div className="relative bg-[#F4F4F4] rounded-xl transition-transform duration-300">
+    <div className="w-[300px] border-[2px] rounded-lg border-[#DBDFD0] overflow-hidden flex flex-col items-center group max-h-[500px]">
+      <div className="relative bg-[#F4F4F4] rounded-xl transition-transform duration-300 h-[60%]">
         <img
           src={imagePath}
           alt=""
-          className="transition-transform duration-300"
+          className="transition-transform duration-300 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
         <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
