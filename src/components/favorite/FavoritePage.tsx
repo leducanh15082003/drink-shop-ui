@@ -27,6 +27,7 @@ const FavoritePage = () => {
             name={item.name || ""}
             des={item.description || ""}
             price={item.price || 0}
+            category=""
           />
         ))}
       </div>
