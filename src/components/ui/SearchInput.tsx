@@ -13,7 +13,7 @@ const SearchInput = ({ value, onChange }: Props) => {
         onChange={onChange}
         type="text"
         placeholder="Search Product..."
-        className="w-full px-4 py-1 pr-10 border border-[#AD343E] rounded-full focus:outline-none focus:ring-2 focus:ring-[#AD343E] placeholder:text-sm placeholder:font-sans bg-[#EFF2E7]"
+        className="w-full px-4 py-1 pr-10 text-black border border-[#AD343E] rounded-full focus:outline-none focus:ring-2 focus:ring-[#AD343E] placeholder:text-sm placeholder:font-sans bg-[#EFF2E7]"
       />
       <svg
         width="15"

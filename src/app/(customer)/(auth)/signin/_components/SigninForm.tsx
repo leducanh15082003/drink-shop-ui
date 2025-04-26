@@ -11,6 +11,7 @@ import { useAuth } from "@/utils/context/AuthContext";
 interface LoginResponse {
   token: string;
   fullName: string;
+  role: string;
 }
 export default function SigninForm() {
   const [form] = Form.useForm();
@@ -35,7 +36,11 @@ export default function SigninForm() {
         toast.success("Login successful!");
         login(data.token);
         window.dispatchEvent(new Event("storage"));
-        router.push("/");
+        if (data.role == "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
       } else {
         toast.error("Login failed: Token not received");
       }

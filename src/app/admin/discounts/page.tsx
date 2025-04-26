@@ -1,10 +1,10 @@
-import CategoryTable from "@/components/admin/category/CategoryTable";
+import DiscountTable from "@/components/admin/discount/DiscountTable";
 import React from "react";
 
 const page = () => {
   return (
     <div>
-      <CategoryTable />
+      <DiscountTable />
     </div>
   );
 };

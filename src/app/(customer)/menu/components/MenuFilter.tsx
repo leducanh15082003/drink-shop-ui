@@ -77,6 +77,15 @@ const MenuFilter = ({ filter, setFilter }: MenuFilterProps) => {
               min={30000}
               max={300000}
               step={10000}
+              range
+              value={[filter.minPrice, filter.maxPrice]}
+              onChange={(value) => {
+                setFilter({
+                  ...filter,
+                  minPrice: value[0],
+                  maxPrice: value[1],
+                });
+              }}
             />
             <div className="flex w-full justify-between">
               <span className="text-xs text-black font-medium font-poppins">

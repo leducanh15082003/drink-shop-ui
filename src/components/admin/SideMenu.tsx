@@ -35,6 +35,11 @@ const SideMenu = () => {
           icon: <ShoppingOutlined />,
           label: "Orders",
         },
+        {
+          key: "discounts",
+          icon: <TagsOutlined />,
+          label: "Discounts",
+        },
       ],
     },
   ];

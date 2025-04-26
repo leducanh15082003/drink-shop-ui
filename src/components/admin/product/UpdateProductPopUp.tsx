@@ -1,152 +1,83 @@
 "use client";
-import { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Upload,
-} from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { htcService } from "@/utils/services/htcService";
-import { CategoryDTO, ProductDTO } from "@/utils/services/Api";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Input, InputNumber, Select, Upload, Button } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import { htcService } from "@/utils/services/htcService";
 import { toast } from "react-toastify";
+import { Edit } from "lucide-react";
 import { supabase } from "@/utils/lib/supabase";
-import DeleteProductPopUp from "./DeleteProductPopUp";
-import UpdateProductPopUp from "./UpdateProductPopUp";
-import { formatCurrency } from "@/utils/format/formatCurrency";
+import { CategoryDTO } from "@/utils/services/Api";
 
-export default function ProductTable() {
-  const [products, setProducts] = useState<ProductDTO[]>();
-  const [categories, setCategories] = useState<CategoryDTO[]>();
+type Props = {
+  productId: number;
+  fetchProducts: () => void;
+  categories: CategoryDTO[];
+};
+
+const UpdateProductPopUp = ({
+  productId,
+  fetchProducts,
+  categories,
+}: Props) => {
+  const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [lastUploadedPath, setLastUploadedPath] = useState<string | null>(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchProducts();
-    htcService.api.getAllCategories().then((res) => {
-      setCategories(res.data);
-    });
-  }, []);
-
-  const fetchProducts = () => {
-    htcService.api.getAllProducts().then((res) => {
-      setProducts(res.data);
-    });
-  };
-
-  const columns: ColumnsType<ProductDTO> = [
-    {
-      title: "Image",
-      dataIndex: "image",
-      render: (url) => (
-        <img
-          src={url}
-          alt="product"
-          className="w-12 h-12 object-cover rounded"
-        />
-      ),
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      render: (price) => `${formatCurrency(price)}`,
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-    },
-    {
-      title: "Actions",
-      render: (_, record) => (
-        <div className="flex gap-2">
-          <UpdateProductPopUp
-            productId={record.id!}
-            fetchProducts={fetchProducts}
-            categories={categories!}
-          />
-          <DeleteProductPopUp
-            productId={record.id!}
-            fetchProducts={fetchProducts}
-          />
-        </div>
-      ),
-    },
-  ];
-
-  const showModal = () => {
-    form.resetFields();
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    form.validateFields().then((values) => {
-      htcService.api
-        .createProduct({
-          name: values.name,
-          description: values.description,
-          price: values.price,
-          categoryId: values.category,
-          image: values.image,
-          ingredients: values.ingredients,
-        })
-        .then((res) => {
-          if (res.status == 200) {
-            fetchProducts();
-            toast.success("Product added successfully!");
-          }
+    if (productId && isModalOpen) {
+      htcService.api.getProductById(productId).then((res) => {
+        form.setFieldsValue({
+          name: res.data.name,
+          description: res.data.description,
+          ingredients: res.data.ingredients,
+          price: res.data.price,
+          category: res.data.categoryId,
+          image: res.data.image,
         });
-      setIsModalOpen(false);
-    });
-  };
-
-  const handleCancel = async () => {
-    if (lastUploadedPath) {
-      await supabase.storage.from("drinkshop").remove([lastUploadedPath]);
-      setLastUploadedPath(null);
+        setImagePreview(res.data.image!);
+      });
     }
+  }, [productId, isModalOpen, form]);
 
-    setImagePreview(null);
-    form.resetFields();
+  const onClose = () => {
     setIsModalOpen(false);
   };
 
-  return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Product List</h2>
-        <Button type="primary" onClick={showModal}>
-          Add Product
-        </Button>
-      </div>
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
 
-      <Table
-        columns={columns}
-        dataSource={products}
-        rowKey="id"
-        pagination={{ pageSize: 5 }}
-      />
+      await htcService.api.updateProduct(productId, {
+        ...values,
+        categoryId: values.category,
+      });
+
+      toast.success("Product updated successfully");
+      fetchProducts();
+      onClose();
+    } catch (error) {
+      toast.error("Failed to update product");
+      console.error(error);
+    }
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setImagePreview(null);
+    onClose();
+  };
+
+  return (
+    <>
+      <Button onClick={() => setIsModalOpen(true)} icon={<Edit size={16} />} />
 
       <Modal
-        title="Add New Product"
+        title="Update Product"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText="Add"
+        okText="Update"
         style={{ top: 20 }}
       >
         <Form form={form} layout="vertical">
@@ -206,10 +137,10 @@ export default function ProductTable() {
                     .getPublicUrl(data.path).data.publicUrl;
 
                   form.setFieldsValue({ image: url });
-                  setImagePreview(url); // state dùng để hiển thị ảnh preview
-                  setLastUploadedPath(data.path); // Lưu lại path mới
+                  setImagePreview(url);
+                  setLastUploadedPath(data.path);
 
-                  return false; // không upload bằng antd, mình tự handle
+                  return false;
                 }}
               >
                 <div
@@ -248,6 +179,8 @@ export default function ProductTable() {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </>
   );
-}
+};
+
+export default UpdateProductPopUp;

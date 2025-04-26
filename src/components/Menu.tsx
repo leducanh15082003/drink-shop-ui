@@ -2,6 +2,7 @@
 "use client";
 
 import ProductOptions from "@/app/(customer)/menu/product-detail/components/ProductOptions";
+import { formatCurrency } from "@/utils/format/formatCurrency";
 import { htcService } from "@/utils/services/htcService";
 import { Modal } from "antd";
 import { useRouter } from "next/navigation";
@@ -106,7 +107,9 @@ const Menu: React.FC<MenuProps> = ({
         </div>
       </div>
       <div className="flex flex-col items-center font-sans max-w-60 py-7 gap-4">
-        <span className="font-bold text-[#AD343E] text-2xl ">$ {price}</span>
+        <span className="font-bold text-[#AD343E] text-2xl ">
+          {formatCurrency(price)}
+        </span>
         <span className="font-bold text-xl text-[#2C2F24]">{name}</span>
         <span className="font-normal text-base text-center text-[#2C2F24]">
           {des}

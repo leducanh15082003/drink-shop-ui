@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { DM_Sans, Poppins, Playfair_Display } from "next/font/google";
 import "../globals.css";
 import { ConfigProvider } from "antd";
@@ -8,6 +7,8 @@ import { AuthProvider } from "@/utils/context/AuthContext";
 import SideMenu from "@/components/admin/SideMenu";
 import Avatar from "@/components/Avatar";
 import "@ant-design/v5-patch-for-react-19"; // 👈 Nhớ ở trên cùng
+import NotificationIcon from "@/components/admin/NotificationIcon";
+import { Metadata } from "next";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -28,8 +29,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "HCT - Home Page",
-  description: "Home Page",
+  title: "HCT - Admin Page",
+  description: "Admin Page",
 };
 
 export default function RootLayout({
@@ -72,7 +73,10 @@ export default function RootLayout({
                   <h1 className="text-lg font-semibold">Admin Dashboard</h1>
                   {/* Bạn có thể thêm avatar, user info ở đây nếu muốn */}
 
-                  <Avatar />
+                  <div className="flex gap-8 items-center">
+                    <NotificationIcon />
+                    <Avatar />
+                  </div>
                 </header>
 
                 {/* Page content */}
