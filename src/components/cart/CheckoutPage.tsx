@@ -15,7 +15,7 @@ const CheckoutPage = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
-  const { cart, clearCart, getTotalPrice } = useCartStore();
+  const { cart, discountId, clearCart, getTotalPrice } = useCartStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -56,6 +56,7 @@ const CheckoutPage = () => {
         iceRate: item.ice,
       })),
       totalPrice: getTotalPrice(),
+      discountId: discountId ? discountId : undefined,
     };
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -130,32 +131,32 @@ const CheckoutPage = () => {
                 {/* Cột 1: Thông tin tài khoản */}
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    Thông tin thanh toán
+                    Payment Information
                   </h3>
                   <p className="text-gray-600 mt-2">
                     <span className="font-medium text-gray-700">
-                      Chủ tài khoản:
+                      Bank account:
                     </span>{" "}
-                    Le Duc Anh
+                    Phan Khanh Huyen
                   </p>
                   <p className="text-gray-600">
                     <span className="font-medium text-gray-700">
-                      Ngân hàng:
+                      Bank name:
                     </span>{" "}
-                    Techcombank
+                    VietinBank
                   </p>
                   <p className="text-gray-600">
                     <span className="font-medium text-gray-700">
-                      Số tài khoản:
+                      Bank number:
                     </span>{" "}
-                    1508230703
+                    106873776847
                   </p>
                 </div>
 
                 {/* Cột 2: QR Code */}
                 <div className="flex flex-1 flex-col items-center">
                   <Image
-                    src="/images/qr-code.jpg"
+                    src="/images/qr-code.png"
                     width={180}
                     height={180}
                     alt="QR Code"

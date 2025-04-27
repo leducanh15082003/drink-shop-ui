@@ -1,10 +1,12 @@
 "use client";
 import { OrderDTO } from "@/utils/services/Api";
 import { htcService } from "@/utils/services/htcService";
-import { Tabs } from "antd";
+import { Button, Popconfirm, Tabs } from "antd";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
+import { formatCurrency } from "@/utils/format/formatCurrency";
+import { toast } from "react-toastify";
 
 const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -13,7 +15,25 @@ const statusColors = {
   CANCELLED: "bg-red-100 text-red-800",
 };
 
-function OrderCard({ order }: { order: OrderDTO }) {
+function OrderCard({
+  fetchOrders,
+  order,
+}: {
+  fetchOrders: () => void;
+  order: OrderDTO;
+}) {
+  const handleCancel = async () => {
+    const response = await htcService.api.updateOrderStatus(
+      order.id as number,
+      "CANCELLED"
+    );
+    console.log(response);
+    if (response.status === 200) {
+      fetchOrders();
+      toast.success("Order cancelled successfully!");
+    }
+  };
+
   return (
     <div className="border rounded-xl p-4 bg-white shadow space-y-3">
       <div className="flex justify-between items-start">
@@ -66,8 +86,30 @@ function OrderCard({ order }: { order: OrderDTO }) {
         </div>
       </div>
 
-      <div className="text-right font-semibold text-lg text-primary">
-        {order.price?.toLocaleString()}₫
+      <div className="flex justify-between items-center font-semibold text-lg text-primary">
+        <div>
+          {order.orderStatus == "PENDING" && (
+            <Popconfirm
+              title="Cancel order"
+              description="Are you sure to Cancel this order?"
+              onConfirm={handleCancel}
+              okText="Cancel"
+              cancelText="Cancel"
+            >
+              <Button type="primary">Cancel</Button>
+            </Popconfirm>
+          )}
+        </div>
+        <div className="flex gap-4">
+          <span className={order.discountAmDouble ? "line-through" : ""}>
+            {formatCurrency(order.price!)}
+          </span>
+          {order.discountAmDouble && (
+            <span className="text-green-500">
+              {formatCurrency(order.price! - order.discountAmDouble)}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -76,8 +118,18 @@ function OrderCard({ order }: { order: OrderDTO }) {
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderDTO[]>([]);
   useEffect(() => {
-    htcService.api.getOrdersByUserId().then((res) => setOrders(res.data));
+    fetchOrders();
   }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await htcService.api.getOrdersByUserId();
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
   const current = orders.filter((o) =>
     ["PENDING", "PROCESSING"].includes(o.orderStatus!)
   );
@@ -95,7 +147,7 @@ export default function OrdersPage() {
           children: (
             <div className="space-y-4">
               {current.map((o) => (
-                <OrderCard key={o.id} order={o} />
+                <OrderCard fetchOrders={fetchOrders} key={o.id} order={o} />
               ))}
             </div>
           ),
@@ -106,7 +158,7 @@ export default function OrdersPage() {
           children: (
             <div className="space-y-4">
               {history.map((o) => (
-                <OrderCard key={o.id} order={o} />
+                <OrderCard fetchOrders={fetchOrders} key={o.id} order={o} />
               ))}
             </div>
           ),

@@ -24,11 +24,14 @@ export interface CartItem {
 
 interface CartState {
   cart: CartItem[];
+  discountId: number | null;
+  discountAmount: number;
   addToCart: (item: CartItem) => void;
   removeFromCart: (item: CartItem) => void;
   clearCart: () => void;
   updateQuantity: (item: CartItem, quantity: number) => void;
   getTotalPrice: () => number;
+  applyDiscount: (discountId: number, discountAmount: number) => void;
 }
 
 const isSameItem = (a: CartItem, b: CartItem) =>
@@ -36,6 +39,8 @@ const isSameItem = (a: CartItem, b: CartItem) =>
 
 export const useCartStore = create<CartState>((set, get) => ({
   cart: getCartFromStorage(),
+  discountId: null,
+  discountAmount: 0,
 
   addToCart: (item) =>
     set((state) => {
@@ -77,4 +82,8 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   getTotalPrice: () =>
     get().cart.reduce((total, item) => total + item.price * item.quantity, 0),
+
+  applyDiscount: (discountId, discountAmount) => {
+    set({ discountId, discountAmount });
+  },
 }));

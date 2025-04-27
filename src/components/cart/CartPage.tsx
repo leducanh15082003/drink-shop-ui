@@ -10,13 +10,20 @@ import { Coins, CreditCard } from "lucide-react";
 import clsx from "clsx";
 import { formatCurrency } from "@/utils/format/formatCurrency";
 import { useRouter } from "next/navigation";
+import VoucherDropdown from "./VoucherDropdown";
 
 const { Title, Text } = Typography;
 
 const CartPage = () => {
-  const { cart, removeFromCart, updateQuantity } = useCartStore();
+  const { cart, removeFromCart, updateQuantity, discountAmount } =
+    useCartStore();
   const [paymentMethod, setPaymentMethod] = React.useState("Cash");
   const route = useRouter();
+
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 
   console.log(cart);
 
@@ -70,6 +77,8 @@ const CartPage = () => {
     },
   ];
 
+  console.log(discountAmount);
+
   return (
     <div className="p-16 bg-white mx-auto">
       <Title level={2}>Shopping Cart</Title>
@@ -84,23 +93,34 @@ const CartPage = () => {
           dataSource={cart}
           pagination={false}
           summary={() => (
-            <Table.Summary.Row>
-              <Table.Summary.Cell index={0} />
-              <Table.Summary.Cell index={1}>
-                <Text strong>Total:</Text>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={0} align="right">
-                <Text strong type="success">
-                  {formatCurrency(
-                    cart.reduce(
-                      (acc, item) => acc + item.price * item.quantity,
-                      0
-                    )
-                  )}
-                </Text>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={0} />
-            </Table.Summary.Row>
+            <>
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0}>
+                  <Text strong>Voucher:</Text>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={1} colSpan={3}>
+                  <VoucherDropdown totalPrice={totalPrice} />
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0} />
+                <Table.Summary.Cell index={1}>
+                  <Text strong>Total:</Text>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={0} align="right" colSpan={2}>
+                  <div className="flex gap-4 font-semibold">
+                    <span className={discountAmount > 0 ? "line-through" : ""}>
+                      {formatCurrency(totalPrice)}
+                    </span>
+                    {discountAmount > 0 && (
+                      <span className="text-green-800">
+                        {formatCurrency(totalPrice - discountAmount)}
+                      </span>
+                    )}
+                  </div>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+            </>
           )}
         />
 

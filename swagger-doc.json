@@ -1535,6 +1535,29 @@
         }
       }
     },
+    "/api/discounts/active": {
+      "get": {
+        "tags": [
+          "discount-controller"
+        ],
+        "operationId": "getAllActiveDiscounts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Discount"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/me": {
       "get": {
         "tags": [
@@ -1576,6 +1599,51 @@
             "items": {
               "$ref": "#/components/schemas/Product"
             }
+          }
+        }
+      },
+      "Discount": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string"
+          },
+          "discountAmountType": {
+            "type": "string",
+            "enum": [
+              "PERCENTAGE",
+              "FIXED"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minimumOrderPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
           }
         }
       },
@@ -1640,6 +1708,13 @@
           },
           "phoneNumber": {
             "type": "string"
+          },
+          "discount": {
+            "$ref": "#/components/schemas/Discount"
+          },
+          "discountAmount": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -1854,51 +1929,6 @@
           }
         }
       },
-      "Discount": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "code": {
-            "type": "string"
-          },
-          "discountAmountType": {
-            "type": "string",
-            "enum": [
-              "PERCENTAGE",
-              "FIXED"
-            ]
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "quantity": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "minimumOrderPrice": {
-            "type": "number",
-            "format": "double"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "description": {
-            "type": "string"
-          }
-        }
-      },
       "CategoryDTO": {
         "type": "object",
         "properties": {
@@ -1989,6 +2019,10 @@
           },
           "paymentMethod": {
             "type": "string"
+          },
+          "discountId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -2034,6 +2068,10 @@
           },
           "phoneNumber": {
             "type": "string"
+          },
+          "discountAmDouble": {
+            "type": "number",
+            "format": "double"
           }
         }
       },

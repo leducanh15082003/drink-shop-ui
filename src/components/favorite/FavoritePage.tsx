@@ -21,7 +21,7 @@ const FavoritePage = () => {
       <div className="flex flex-wrap gap-6 justify-center align-center">
         {favorite.map((item, index) => (
           <Menu
-            id={index + 1}
+            id={item.id || 0}
             key={index}
             imagePath={item.image || ""}
             name={item.name || ""}

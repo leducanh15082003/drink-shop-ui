@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import ProductOptions from "../components/ProductOptions";
 import Menu from "@/components/Menu";
 import { htcService } from "@/utils/services/htcService";
+import { formatCurrency } from "@/utils/format/formatCurrency";
 
 const menuItems = [
   {
@@ -116,10 +117,10 @@ const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
             </p>
             <div className="flex items-center gap-6">
               <p className="font-semibold text-[32px]">
-                {product?.price.toFixed(2)}đ
+                {formatCurrency(product?.price || 0)}
               </p>
               <p className="font-normal text-[16px] text-[#B6B6B6] line-through">
-                {product?.price ? (product.price * 1.2).toFixed(2) + "đ" : ""}
+                {product?.price ? formatCurrency(product.price * 1.2) : ""}
               </p>
             </div>
             <div className="h-[1px] bg-[#B6B6B6] w-[300px] my-5" />

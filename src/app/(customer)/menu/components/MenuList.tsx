@@ -87,7 +87,7 @@ const MenuList = () => {
       <div className="flex flex-wrap gap-6 justify-center align-center">
         {menuItems.map((item, index) => (
           <Menu
-            id={index + 1}
+            id={item.id as number}
             key={index}
             imagePath={item.image as string}
             name={item.name as string}

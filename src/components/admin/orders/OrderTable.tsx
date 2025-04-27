@@ -1,4 +1,5 @@
 "use client";
+import { formatCurrency } from "@/utils/format/formatCurrency";
 import { OrderDTO } from "@/utils/services/Api";
 import { htcService } from "@/utils/services/htcService";
 import { Table, Tag, Drawer, Select, Button } from "antd";
@@ -13,7 +14,6 @@ const orderStatusColors: Record<string, string> = {
   PENDING: "orange",
   PROCESSING: "blue",
   COMPLETED: "green",
-  CANCELLED: "red",
 };
 
 const paymentStatusColors: Record<string, string> = {
@@ -91,7 +91,18 @@ const OrderTable = () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      render: (price: number) => `${price.toLocaleString()}₫`,
+      render: (_, record) => (
+        <div className="flex gap-2">
+          <span className={record.discountAmDouble ? "line-through" : ""}>
+            {formatCurrency(record.price!)}
+          </span>
+          {record.discountAmDouble && (
+            <span className="text-green-500">
+              {formatCurrency(record.price! - record.discountAmDouble)}
+            </span>
+          )}
+        </div>
+      ),
     },
     {
       title: "Status",

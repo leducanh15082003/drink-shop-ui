@@ -17,6 +17,25 @@ export interface Category {
   products?: Product[];
 }
 
+export interface Discount {
+  /** @format int64 */
+  id?: number;
+  code?: string;
+  discountAmountType?: "PERCENTAGE" | "FIXED";
+  /** @format double */
+  amount?: number;
+  /** @format date-time */
+  startDate?: string;
+  /** @format date-time */
+  endDate?: string;
+  /** @format int32 */
+  quantity?: number;
+  /** @format double */
+  minimumOrderPrice?: number;
+  isActive?: boolean;
+  description?: string;
+}
+
 export interface Inventory {
   /** @format int64 */
   id?: number;
@@ -40,6 +59,9 @@ export interface Order {
   status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED";
   address?: string;
   phoneNumber?: string;
+  discount?: Discount;
+  /** @format double */
+  discountAmount?: number;
 }
 
 export interface OrderDetail {
@@ -128,25 +150,6 @@ export interface DiscountDTO {
   description?: string;
 }
 
-export interface Discount {
-  /** @format int64 */
-  id?: number;
-  code?: string;
-  discountAmountType?: "PERCENTAGE" | "FIXED";
-  /** @format double */
-  amount?: number;
-  /** @format date-time */
-  startDate?: string;
-  /** @format date-time */
-  endDate?: string;
-  /** @format int32 */
-  quantity?: number;
-  /** @format double */
-  minimumOrderPrice?: number;
-  isActive?: boolean;
-  description?: string;
-}
-
 export interface CategoryDTO {
   /** @format int64 */
   id?: number;
@@ -185,6 +188,8 @@ export interface OrderRequest {
   address?: string;
   phoneNumber?: string;
   paymentMethod?: string;
+  /** @format int64 */
+  discountId?: number;
 }
 
 export interface OrderDTO {
@@ -201,6 +206,8 @@ export interface OrderDTO {
   orderDetails?: OrderDetailsDTO[];
   address?: string;
   phoneNumber?: string;
+  /** @format double */
+  discountAmDouble?: number;
 }
 
 export interface OrderDetailsDTO {
@@ -1263,6 +1270,22 @@ export class Api<SecurityDataType extends unknown> {
     getInventoryByProductId: (productId: number, params: RequestParams = {}) =>
       this.http.request<Inventory, any>({
         path: `/api/inventories/product/${productId}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags discount-controller
+     * @name GetAllActiveDiscounts
+     * @request GET:/api/discounts/active
+     * @secure
+     */
+    getAllActiveDiscounts: (params: RequestParams = {}) =>
+      this.http.request<Discount[], any>({
+        path: `/api/discounts/active`,
         method: "GET",
         secure: true,
         ...params,
