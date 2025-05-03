@@ -301,7 +301,7 @@ export class HttpClient<SecurityDataType = unknown> {
   private format?: ResponseType;
 
   constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8080" });
+    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "https://drink-shop-be.onrender.com" });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -393,7 +393,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title API Documentation
  * @version 1.0
- * @baseUrl http://localhost:8080
+ * @baseUrl https://drink-shop-be.onrender.com
  *
  * Swagger API documentation with Bearer Authentication
  */
