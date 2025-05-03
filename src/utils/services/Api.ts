@@ -882,7 +882,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     createProduct: (data: CreateProductDTO, params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/products`,
         method: "POST",
         body: data,
@@ -1120,7 +1120,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     createNewUser: (data: SignupRequestDTO, params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/auth/register`,
         method: "POST",
         body: data,
@@ -1138,7 +1138,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     authenticateUser: (data: LoginRequestDTO, params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/auth/login`,
         method: "POST",
         body: data,
@@ -1300,7 +1300,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     getCurrentUser: (params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/auth/me`,
         method: "GET",
         secure: true,
