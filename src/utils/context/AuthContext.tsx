@@ -45,11 +45,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         console.error("Failed to fetch current user", error);
         setIsAuthenticated(false);
-        router.push("/signin"); // Redirect to signin if the user is not authenticated or token is invalid
       }
     } else {
       setIsAuthenticated(false);
-      router.push("/signin"); // Redirect to signin if no token found
     }
     setLoading(false);
   };
