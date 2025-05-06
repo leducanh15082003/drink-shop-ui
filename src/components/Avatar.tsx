@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useAuth } from "@/utils/context/AuthContext";
 import { Dropdown, MenuProps } from "antd";
@@ -20,14 +21,21 @@ const Avatar = () => {
         <div className="cursor-default hover:none">{currentUser?.email}</div>
       ),
     },
-    {
-      key: "profile",
-      label: (
-        <div onClick={() => router.push("/profile")} className="cursor-pointer">
-          My Profile
-        </div>
-      ),
-    },
+    ...(currentUser?.role !== "ADMIN"
+      ? [
+          {
+            key: "profile",
+            label: (
+              <div
+                onClick={() => router.push("/profile")}
+                className="cursor-pointer"
+              >
+                My Profile
+              </div>
+            ),
+          },
+        ]
+      : []),
     // ✅ Thêm mục Dashboard nếu là admin
     ...(currentUser?.role === "ADMIN"
       ? [

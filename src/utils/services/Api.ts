@@ -256,6 +256,13 @@ export interface ProductDTO {
   categoryId?: number;
 }
 
+export interface StatisticDTO {
+  label?: string;
+  value?: object;
+  change?: string;
+  positive?: boolean;
+}
+
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
 import axios from "axios";
 
@@ -301,7 +308,7 @@ export class HttpClient<SecurityDataType = unknown> {
   private format?: ResponseType;
 
   constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "https://drink-shop-be.onrender.com" });
+    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8080" });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -393,7 +400,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title API Documentation
  * @version 1.0
- * @baseUrl https://drink-shop-be.onrender.com
+ * @baseUrl http://localhost:8080
  *
  * Swagger API documentation with Bearer Authentication
  */
@@ -882,7 +889,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     createProduct: (data: CreateProductDTO, params: RequestParams = {}) =>
-      this.http.request({
+      this.http.request<object, any>({
         path: `/api/products`,
         method: "POST",
         body: data,
@@ -1120,7 +1127,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     createNewUser: (data: SignupRequestDTO, params: RequestParams = {}) =>
-      this.http.request({
+      this.http.request<object, any>({
         path: `/api/auth/register`,
         method: "POST",
         body: data,
@@ -1138,7 +1145,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     authenticateUser: (data: LoginRequestDTO, params: RequestParams = {}) =>
-      this.http.request({
+      this.http.request<object, any>({
         path: `/api/auth/login`,
         method: "POST",
         body: data,
@@ -1300,8 +1307,24 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     getCurrentUser: (params: RequestParams = {}) =>
-      this.http.request({
+      this.http.request<object, any>({
         path: `/api/auth/me`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags dashboard-controller
+     * @name GetTotalOrders
+     * @request GET:/api/admin/statistics/orders
+     * @secure
+     */
+    getTotalOrders: (params: RequestParams = {}) =>
+      this.http.request<StatisticDTO, any>({
+        path: `/api/admin/statistics/orders`,
         method: "GET",
         secure: true,
         ...params,

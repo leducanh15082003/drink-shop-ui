@@ -1577,6 +1577,26 @@
           }
         }
       }
+    },
+    "/api/admin/statistics/orders": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getTotalOrders",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticDTO"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2176,6 +2196,23 @@
           "categoryId": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "StatisticDTO": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          },
+          "change": {
+            "type": "string"
+          },
+          "positive": {
+            "type": "boolean"
           }
         }
       }

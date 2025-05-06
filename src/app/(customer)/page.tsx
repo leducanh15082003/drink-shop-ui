@@ -1,33 +1,5 @@
 import Advertise from "@/components/homepage/Advertise";
-import Drink from "@/components/homepage/Drink";
 import MenuList from "./menu/components/MenuList";
-
-const drinks = [
-  {
-    imagePath: "/images/products/product1.png",
-    name: "Espresso Ice Coffee",
-    category: "Coffee",
-    price: "11.00",
-  },
-  {
-    imagePath: "/images/products/product2.png",
-    name: "Cappuchino Ice Coffee",
-    category: "Coffee",
-    price: "11.00",
-  },
-  {
-    imagePath: "/images/products/product3.png",
-    name: "Americano Coffee",
-    category: "Coffee",
-    price: "11.00",
-  },
-  {
-    imagePath: "/images/products/product4.png",
-    name: "Robusta",
-    category: "Coffee",
-    price: "11.00",
-  },
-];
 
 export default function Home() {
   return (
@@ -51,30 +23,6 @@ export default function Home() {
           </div>
         </div>
         {/* background image */}
-
-        {/* top Product */}
-        <div className="pt-6 flex flex-col items-center">
-          <span className="font-playfair text-[60px] font-normal">
-            Top Products
-          </span>
-          <div className="flex gap-16 pt-4 pb-11">
-            {drinks.map((drink, index) => (
-              <Drink
-                key={index}
-                imagePath={drink.imagePath}
-                name={drink.name}
-                category={drink.category}
-                price={drink.price}
-              />
-            ))}
-          </div>
-          <div className="bg-[#AD343E] py-3 px-10 rounded-3xl cursor-pointer">
-            <span className="font-poppins font-semibold text-lg text-white">
-              View All
-            </span>
-          </div>
-        </div>
-        {/* top Product */}
 
         {/* advertise */}
         <div className="pl-[90px] py-14 pr-[120px]">
