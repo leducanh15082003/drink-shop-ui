@@ -83,9 +83,8 @@ const OrderTable = () => {
     },
     {
       title: "User",
-      dataIndex: "userId",
-      key: "userId",
-      render: (id: number) => `User #${id}`,
+      dataIndex: "userName",
+      render: (name: string) => name || "Anonymous",
     },
     {
       title: "Price",

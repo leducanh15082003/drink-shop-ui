@@ -42,7 +42,6 @@ const options = [
 const ProductOptions = ({
   productId,
   productName,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   image,
   basePrice,
   category,
@@ -77,8 +76,7 @@ const ProductOptions = ({
   const handleAddToCart = () => {
     addToCart({
       id: productId,
-      image: "/images/menu/FriedEggs.png",
-      // image: image,
+      image,
       name: productName,
       price:
         basePrice + sizeIncrements[selectedSize as keyof typeof sizeIncrements],

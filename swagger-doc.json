@@ -2238,6 +2238,9 @@
             "type": "integer",
             "format": "int64"
           },
+          "userName": {
+            "type": "string"
+          },
           "price": {
             "type": "number",
             "format": "double"

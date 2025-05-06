@@ -11,6 +11,7 @@ import clsx from "clsx";
 import { formatCurrency } from "@/utils/format/formatCurrency";
 import { useRouter } from "next/navigation";
 import VoucherDropdown from "./VoucherDropdown";
+import { useAuth } from "@/utils/context/AuthContext";
 
 const { Title, Text } = Typography;
 
@@ -19,6 +20,7 @@ const CartPage = () => {
     useCartStore();
   const [paymentMethod, setPaymentMethod] = React.useState("Cash");
   const route = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -77,8 +79,6 @@ const CartPage = () => {
     },
   ];
 
-  console.log(discountAmount);
-
   return (
     <div className="p-16 bg-white mx-auto">
       <Title level={2}>Shopping Cart</Title>
@@ -94,14 +94,16 @@ const CartPage = () => {
           pagination={false}
           summary={() => (
             <>
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0}>
-                  <Text strong>Voucher:</Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={1} colSpan={3}>
-                  <VoucherDropdown totalPrice={totalPrice} />
-                </Table.Summary.Cell>
-              </Table.Summary.Row>
+              {isAuthenticated && (
+                <Table.Summary.Row>
+                  <Table.Summary.Cell index={0}>
+                    <Text strong>Voucher:</Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={1} colSpan={3}>
+                    <VoucherDropdown totalPrice={totalPrice} />
+                  </Table.Summary.Cell>
+                </Table.Summary.Row>
+              )}
               <Table.Summary.Row>
                 <Table.Summary.Cell index={0} />
                 <Table.Summary.Cell index={1}>
