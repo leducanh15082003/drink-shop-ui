@@ -1,7 +1,28 @@
+"use client";
 import Advertise from "@/components/homepage/Advertise";
 import MenuList from "./menu/components/MenuList";
+import { useEffect } from "react";
+import { htcService } from "@/utils/services/htcService";
 
 export default function Home() {
+
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem("visitedHome");
+    if (hasVisited) {
+      return;
+    }
+    sessionStorage.setItem("visitedHome", "true");
+
+    const recordVisit = async () => {
+      try {
+        await htcService.api.recordVisit();
+      } catch (err) {
+        console.error("Failed to record visit:", err);
+      }
+    };
+    recordVisit();
+  }, []);
+  
   return (
     <div>
       <main className="pb-28">

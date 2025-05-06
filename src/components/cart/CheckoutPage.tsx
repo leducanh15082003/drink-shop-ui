@@ -42,6 +42,20 @@ const CheckoutPage = () => {
       toast.info("Please enter phone number and your location!");
       return;
     }
+
+    try {
+      await htcService.api.updateQuantitySold(
+        cart.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+        }))
+      );
+    } catch (error) {
+      toast.error("Failed to update product quantity");
+      console.error("Update quantity error", error);
+      return;
+    }
+    
     const orderData: OrderRequest = {
       phoneNumber: phone,
       address,

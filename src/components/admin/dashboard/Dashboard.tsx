@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { Card, Button, Table } from "antd";
+import { Card, Button, Table, Spin } from "antd";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { FilterOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -13,47 +13,21 @@ interface Stat {
   positive: boolean;
 }
 
-const revenueData = [
-  { name: "Jan", value: 55 },
-  { name: "Feb", value: 65 },
-  { name: "Mar", value: 78 },
-  { name: "Apr", value: 60 },
-  { name: "May", value: 42 },
-  { name: "Jun", value: 58 },
-  { name: "Jul", value: 66 },
-  { name: "Aug", value: 77 },
-  { name: "Sep", value: 64 },
-  { name: "Oct", value: 52 },
-  { name: "Nov", value: 47 },
-  { name: "Dec", value: 70 },
-];
+interface MonthlyRevenue {
+  month: string;
+  value: number;
+}
 
-const productData = [
-  {
-    key: "1",
-    name: "Matcha Latte",
-    description: "Description",
-    category: "Tea",
-    price: "50,000đ",
-    image: "/images/matcha.jpg",
-  },
-  {
-    key: "2",
-    name: "Espresso",
-    description: "Description",
-    category: "Coffee",
-    price: "50,000đ",
-    image: "/images/matcha.jpg",
-  },
-  {
-    key: "3",
-    name: "Croissant",
-    description: "Description",
-    category: "Pastry",
-    price: "50,000đ",
-    image: "/images/matcha.jpg",
-  },
-];
+interface ProductData {
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  ingredients: string;
+  category: string;
+  categoryId: number;
+}
 
 const columns = [
   {
@@ -74,29 +48,59 @@ const columns = [
 
 export default function Dashboard() {
   const [orderStat, setOrderStat] = useState<Stat | null>(null);
+  const [revenueStat, setRevenueStat] = useState<Stat | null>(null);
+  const [totalProducts, setTotalProducts] = useState<number | null>(null);
+  const [visitStat, setVisitStat] = useState<Stat | null>(null);
+  const [revenueData, setRevenueData] = useState<MonthlyRevenue[]>([]);
+  const [productData, setProductData] = useState<ProductData[]>([])
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const fetchOrderStat = async () => {
+    const fetchStats = async () => {
       try {
-        const response = await htcService.api.getTotalOrders();
-        const data = response.data as {
-          label?: string;
-          value?: number | string;
-          change?: string;
-          positive?: boolean;
-        };
-        const stat: Stat = {
-          label: data.label ?? "Total Orders",
-          value: data.value ?? 0,
-          change: data.change ?? "0%",
-          positive: data.positive ?? false,
-        };
-        setOrderStat(stat);
+        const [orderRes, revenueRes, productRes, visitRes, revenueEachMonthRes, topSoldRes] = await Promise.all([
+          htcService.api.getTotalOrders(),
+          htcService.api.getMonthlyRevenue(),
+          htcService.api.getTotalProductsStat(),
+          htcService.api.getVisits(),
+          htcService.api.getRevenueDataEachMonth(),
+          htcService.api.getTopSoldProducts()
+        ]);
+
+        // Map DTO → Stat với default
+        const mapToStat = (dto: any, fallbackLabel: string): Stat => ({
+          label: dto.label ?? fallbackLabel,
+          value: dto.value ?? 0,
+          change: dto.change ?? "0%",
+          positive: dto.positive ?? false,
+        });
+
+        setOrderStat(mapToStat(orderRes.data, "Completed Orders"));
+        setRevenueStat(mapToStat(revenueRes.data, "Revenue"));
+
+        const prodDto = productRes.data as { value?: number };
+        const total = prodDto.value ?? 0;
+        setTotalProducts(total);
+        setVisitStat(mapToStat(visitRes.data, "Website Visit Counts"));
+        setRevenueData(revenueEachMonthRes.data as MonthlyRevenue[]);
+        setProductData(topSoldRes.data as ProductData[])
       } catch (err) {
-        console.error("Failed to fetch order stat", err);
+        console.error("Failed to fetch stats", err);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchOrderStat();
+    fetchStats();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Spin size="large" />
+      </div>
+    );
+  }
+  
   return (
     <div className="p-6 space-y-6">
       {/* Stats Cards */}
@@ -111,6 +115,30 @@ export default function Dashboard() {
               {orderStat?.change}
             </p>
           </>
+        </Card>
+
+        <Card bordered>
+          <p className="text-gray-500 text-sm">{revenueStat?.label}</p>
+          <p className="text-xl font-bold">{revenueStat?.value}</p>
+          <p
+            className={`text-sm ${
+              revenueStat?.positive ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {revenueStat?.change}
+          </p>
+        </Card>
+
+        <Card bordered>
+          <p className="text-gray-500 text-sm">Total Products</p>
+          <p className="text-xl font-bold">{totalProducts}</p>
+        </Card>
+        <Card bordered>
+          <p className="text-gray-500 text-sm">{visitStat?.label}</p>
+          <p className="text-xl font-bold">{visitStat?.value}</p>
+          <p className={`text-sm ${visitStat?.positive ? "text-green-600" : "text-red-600"}`}>
+            {visitStat?.change}
+          </p>
         </Card>
       </div>
 

@@ -834,6 +834,19 @@
         }
       }
     },
+    "/api/visits": {
+      "post": {
+        "tags": [
+          "visit-controller"
+        ],
+        "operationId": "recordVisit",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/products": {
       "get": {
         "tags": [
@@ -903,6 +916,39 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateProductDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/update-quantity-sold": {
+      "post": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "updateQuantitySold",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProductQuantityDTO"
+                }
               }
             }
           },
@@ -1336,6 +1382,29 @@
         }
       }
     },
+    "/api/products/top-sold": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "getTopSoldProducts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/products/favorites": {
       "get": {
         "tags": [
@@ -1571,6 +1640,101 @@
               "*/*": {
                 "schema": {
                   "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/statistics/visit-counts": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getVisits",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/statistics/total-products": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getTotalProductsStat",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/statistics/revenue": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getMonthlyRevenue",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/statistics/revenue-data": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getRevenueDataEachMonth",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 2025
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonthlyRevenueDTO"
+                  }
                 }
               }
             }
@@ -1819,6 +1983,10 @@
           "imageUrl": {
             "type": "string"
           },
+          "quantitySold": {
+            "type": "integer",
+            "format": "int32"
+          },
           "category": {
             "$ref": "#/components/schemas/Category"
           },
@@ -1986,6 +2154,19 @@
           "categoryId": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "ProductQuantityDTO": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2213,6 +2394,18 @@
           },
           "positive": {
             "type": "boolean"
+          }
+        }
+      },
+      "MonthlyRevenueDTO": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
           }
         }
       }

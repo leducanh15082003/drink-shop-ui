@@ -99,6 +99,8 @@ export interface Product {
   /** @format double */
   price?: number;
   imageUrl?: string;
+  /** @format int32 */
+  quantitySold?: number;
   category?: Category;
   orderDetails?: OrderDetail[];
   inventory?: Inventory;
@@ -166,6 +168,13 @@ export interface CreateProductDTO {
   ingredients?: string;
   /** @format int64 */
   categoryId?: number;
+}
+
+export interface ProductQuantityDTO {
+  /** @format int64 */
+  productId?: number;
+  /** @format int32 */
+  quantity?: number;
 }
 
 export interface CartItemDTO {
@@ -261,6 +270,12 @@ export interface StatisticDTO {
   value?: object;
   change?: string;
   positive?: boolean;
+}
+
+export interface MonthlyRevenueDTO {
+  month?: string;
+  /** @format double */
+  value?: number;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
@@ -855,6 +870,22 @@ export class Api<SecurityDataType extends unknown> {
     /**
      * No description
      *
+     * @tags visit-controller
+     * @name RecordVisit
+     * @request POST:/api/visits
+     * @secure
+     */
+    recordVisit: (params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/visits`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags product-controller
      * @name GetAllProducts
      * @request GET:/api/products
@@ -891,6 +922,24 @@ export class Api<SecurityDataType extends unknown> {
     createProduct: (data: CreateProductDTO, params: RequestParams = {}) =>
       this.http.request<object, any>({
         path: `/api/products`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
+     * @name UpdateQuantitySold
+     * @request POST:/api/products/update-quantity-sold
+     * @secure
+     */
+    updateQuantitySold: (data: ProductQuantityDTO[], params: RequestParams = {}) =>
+      this.http.request<object, any>({
+        path: `/api/products/update-quantity-sold`,
         method: "POST",
         body: data,
         secure: true,
@@ -1174,6 +1223,22 @@ export class Api<SecurityDataType extends unknown> {
      * No description
      *
      * @tags product-controller
+     * @name GetTopSoldProducts
+     * @request GET:/api/products/top-sold
+     * @secure
+     */
+    getTopSoldProducts: (params: RequestParams = {}) =>
+      this.http.request<ProductDTO[], any>({
+        path: `/api/products/top-sold`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags product-controller
      * @name GetFavoriteProducts
      * @request GET:/api/products/favorites
      * @secure
@@ -1310,6 +1375,80 @@ export class Api<SecurityDataType extends unknown> {
       this.http.request<object, any>({
         path: `/api/auth/me`,
         method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags dashboard-controller
+     * @name GetVisits
+     * @request GET:/api/admin/statistics/visit-counts
+     * @secure
+     */
+    getVisits: (params: RequestParams = {}) =>
+      this.http.request<StatisticDTO, any>({
+        path: `/api/admin/statistics/visit-counts`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags dashboard-controller
+     * @name GetTotalProductsStat
+     * @request GET:/api/admin/statistics/total-products
+     * @secure
+     */
+    getTotalProductsStat: (params: RequestParams = {}) =>
+      this.http.request<StatisticDTO, any>({
+        path: `/api/admin/statistics/total-products`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags dashboard-controller
+     * @name GetMonthlyRevenue
+     * @request GET:/api/admin/statistics/revenue
+     * @secure
+     */
+    getMonthlyRevenue: (params: RequestParams = {}) =>
+      this.http.request<StatisticDTO, any>({
+        path: `/api/admin/statistics/revenue`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags dashboard-controller
+     * @name GetRevenueDataEachMonth
+     * @request GET:/api/admin/statistics/revenue-data
+     * @secure
+     */
+    getRevenueDataEachMonth: (
+      query?: {
+        /**
+         * @format int32
+         * @default 2025
+         */
+        year?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.http.request<MonthlyRevenueDTO[], any>({
+        path: `/api/admin/statistics/revenue-data`,
+        method: "GET",
+        query: query,
         secure: true,
         ...params,
       }),
