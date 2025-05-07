@@ -69,9 +69,16 @@ export default function CategoryTable() {
           if (res.status == 200) {
             fetchCategories();
             toast.success("Category added successfully!");
+            setIsModalOpen(false);
+          }
+        })
+        .catch((e) => {
+          if (e.response && e.response.data && e.response.data.message) {
+            toast.error(e.response.data.message);
+          } else {
+            toast.error("Category already exist!");
           }
         });
-      setIsModalOpen(false);
     });
   };
 

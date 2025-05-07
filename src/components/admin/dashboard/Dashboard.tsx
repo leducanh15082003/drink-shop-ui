@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { Card, Button, Table, Spin } from "antd";
@@ -52,19 +53,26 @@ export default function Dashboard() {
   const [totalProducts, setTotalProducts] = useState<number | null>(null);
   const [visitStat, setVisitStat] = useState<Stat | null>(null);
   const [revenueData, setRevenueData] = useState<MonthlyRevenue[]>([]);
-  const [productData, setProductData] = useState<ProductData[]>([])
+  const [productData, setProductData] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [orderRes, revenueRes, productRes, visitRes, revenueEachMonthRes, topSoldRes] = await Promise.all([
+        const [
+          orderRes,
+          revenueRes,
+          productRes,
+          visitRes,
+          revenueEachMonthRes,
+          topSoldRes,
+        ] = await Promise.all([
           htcService.api.getTotalOrders(),
           htcService.api.getMonthlyRevenue(),
           htcService.api.getTotalProductsStat(),
           htcService.api.getVisits(),
           htcService.api.getRevenueDataEachMonth(),
-          htcService.api.getTopSoldProducts()
+          htcService.api.getTopSoldProducts(),
         ]);
 
         // Map DTO → Stat với default
@@ -83,7 +91,7 @@ export default function Dashboard() {
         setTotalProducts(total);
         setVisitStat(mapToStat(visitRes.data, "Website Visit Counts"));
         setRevenueData(revenueEachMonthRes.data as MonthlyRevenue[]);
-        setProductData(topSoldRes.data as ProductData[])
+        setProductData(topSoldRes.data as ProductData[]);
       } catch (err) {
         console.error("Failed to fetch stats", err);
       } finally {
@@ -100,7 +108,7 @@ export default function Dashboard() {
       </div>
     );
   }
-  
+
   return (
     <div className="p-6 space-y-6">
       {/* Stats Cards */}
@@ -136,14 +144,16 @@ export default function Dashboard() {
         <Card bordered>
           <p className="text-gray-500 text-sm">{visitStat?.label}</p>
           <p className="text-xl font-bold">{visitStat?.value}</p>
-          <p className={`text-sm ${visitStat?.positive ? "text-green-600" : "text-red-600"}`}>
+          <p
+            className={`text-sm ${visitStat?.positive ? "text-green-600" : "text-red-600"}`}
+          >
             {visitStat?.change}
           </p>
         </Card>
       </div>
 
       {/* Revenue Chart */}
-      <Card title="Revenue" extra={<Button> This Month </Button>}>
+      <Card title="Revenue" extra={<Button> This Year </Button>}>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={revenueData}>
             <XAxis dataKey="name" />

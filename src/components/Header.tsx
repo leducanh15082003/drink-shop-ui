@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import NavBar from "@/components/ui/nav-bar";
@@ -10,10 +9,18 @@ import FavoriteIcon from "./favorite/FavoriteIcon";
 import Avatar from "./Avatar";
 import Link from "next/link";
 import { ReceiptText } from "lucide-react";
+import { useState } from "react";
 
 export default function Header() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      router.push(`/menu?search=${encodeURIComponent(searchTerm)}`);
+    }
+  };
 
   return (
     <header className="sticky top-0 bg-white h-[90px] flex flex-col z-50 shadow-sm justify-center font-sans font-medium">
@@ -24,6 +31,9 @@ export default function Header() {
         <div className="relative">
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleSearch}
             placeholder="Search Product..."
             className="w-[300px] px-4 py-1 pr-10 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-sm placeholder:font-sans"
           />

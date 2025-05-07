@@ -73,7 +73,7 @@ const Avatar = () => {
           />
         </div>
         <span className="absolute text-black text-xs -bottom-[18px]">
-          {truncatedFullName || "User"}
+          {truncatedFullName || ""}
         </span>
       </div>
     </Dropdown>

@@ -8,37 +8,6 @@ import Menu from "@/components/Menu";
 import { htcService } from "@/utils/services/htcService";
 import { formatCurrency } from "@/utils/format/formatCurrency";
 
-const menuItems = [
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Fried Eggs",
-    des: "Made with eggs, lettuce, salt, oil and other ingredients.",
-    price: 9.99,
-    category: "Breakfast",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Hawaiian Pizza",
-    des: "Made with tomato sauce, cheese, ham, pineapple.",
-    price: 15.99,
-    category: "Breakfast",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Martinez Cocktail",
-    des: "A classic gin-based cocktail with vermouth and bitters.",
-    price: 7.25,
-    category: "Breakfast",
-  },
-  {
-    imagePath: "/images/menu/FriedEggs.png",
-    name: "Butterscotch Cake",
-    des: "A rich and moist cake with caramelized sugar and butter flavor.",
-    price: 20.99,
-    category: "Breakfast",
-  },
-];
-
 interface ProductDTO {
   id: number;
   name: string;
@@ -52,6 +21,7 @@ interface ProductDTO {
 const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
   const [productId, setProductId] = useState<number | null>(null);
   const [product, setProduct] = useState<ProductDTO | null>(null);
+  const [youMightLike, setYouMightLike] = useState<ProductDTO[]>([]);
 
   useEffect(() => {
     params.then(({ id }) => setProductId(Number(id)));
@@ -68,52 +38,46 @@ const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
         }
       };
       fetchProduct();
+
+      const fetchTopSold = async () => {
+        try {
+          const res = await htcService.api.getTopSoldProducts();
+          setYouMightLike(res.data as ProductDTO[]);
+        } catch (e) {
+          console.error("Error fetching top sold products:", e);
+        }
+      };
+      fetchTopSold();
     }
   }, [productId]);
+
   return (
     <div className="bg-white p-12">
       <Breadcrumb
         separator=">"
         items={[
-          {
-            title: "Menu",
-            href: "/menu",
-          },
-          {
-            title: "Product Name",
-          },
+          { title: "Menu", href: "/menu" },
+          { title: product?.name || "Product Name" },
         ]}
       />
+
       <div className="mx-16 my-5 space-y-10 font-poppins text-black">
         {/* Top */}
         <div className="flex gap-16 justify-between ">
           {/* Product Image */}
           <div className="flex w-2/3 gap-3">
             <img
-              className="w-2/3 rounded-xl"
+              className="w-full rounded-xl"
               src={product?.image}
               alt={product?.name}
             />
-
-            <div className="w-1/3 flex flex-col gap-3">
-              <img
-                className="rounded-xl"
-                src={product?.image}
-                alt={product?.name}
-              />
-              <img
-                className="rounded-xl"
-                src={product?.image}
-                alt={product?.name}
-              />
-            </div>
           </div>
 
           {/* Product Action */}
           <div className="w-1/3">
             <p className="font-semibold text-[32px]">{product?.name}</p>
             <p className="font-normal text-[16px] px-2 border-l-[1px] border-[#CFD1C9]">
-              5034 Sold
+              {/* You can display sold count if available */}
             </p>
             <div className="flex items-center gap-6">
               <p className="font-semibold text-[32px]">
@@ -128,13 +92,14 @@ const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
               <ProductOptions
                 productId={product.id}
                 basePrice={product.price}
-                category={product.category?.toLowerCase()}
+                category={product.category.toLowerCase()}
                 productName={product.name}
                 image={product.image}
               />
             )}
           </div>
         </div>
+
         {/* Product Detail */}
         <div>
           <h3 className="text-[30px] font-normal my-3">Descriptions</h3>
@@ -144,24 +109,23 @@ const ProductDetail = ({ params }: { params: Promise<{ id: number }> }) => {
           <ul>
             {product?.ingredients
               .split(",")
-              .map((ingredient, index) => (
-                <li key={index}>{ingredient.trim()}</li>
-              ))}
+              .map((ing, idx) => <li key={idx}>{ing.trim()}</li>)}
           </ul>
         </div>
       </div>
+
       <div className="my-5 space-y-10 font-poppins text-black">
         <h2 className="text-[40px] font-normal text-center">
           You might also like
         </h2>
-        <div className="flex flex-wrap gap-6 justify-center align-center">
-          {menuItems.map((item, index) => (
+        <div className="flex flex-wrap gap-6 justify-center items-center">
+          {youMightLike.map((item) => (
             <Menu
-              id={index}
-              key={index}
-              imagePath={item.imagePath}
+              key={item.id}
+              id={item.id}
+              imagePath={item.image}
               name={item.name}
-              des={item.des}
+              des={item.description}
               price={item.price}
               category={item.category}
             />

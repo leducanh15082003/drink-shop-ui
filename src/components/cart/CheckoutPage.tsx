@@ -58,15 +58,18 @@ const CheckoutPage = () => {
       discountId: discountId ? discountId : undefined,
     };
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const response = await htcService.api.checkout(orderData);
       if (response.status !== 200) {
         toast.error("Order failed!");
         return;
       }
+      if (!currentUser) {
+        const orderId = response.data.id;
+        await htcService.api.recordGuestOrder(orderId as number);
+      }
       toast.success("Order successfully!");
       clearCart();
-      router.push("/");
+      router.push("/profile/order");
     } catch (e) {
       console.error("Fail while ordering!", e);
       toast.error("Fail while ordering, please try again");

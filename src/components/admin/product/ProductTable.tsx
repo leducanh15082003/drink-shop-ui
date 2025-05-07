@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useEffect, useState } from "react";
 import {
@@ -108,6 +109,17 @@ export default function ProductTable() {
           if (res.status == 200) {
             fetchProducts();
             toast.success("Product added successfully!");
+          }
+        })
+        .catch((error) => {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
+            toast.error(error.response.data.message); // "Product name already exists"
+          } else {
+            toast.error("Product name already exists!");
           }
         });
       setIsModalOpen(false);

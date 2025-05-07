@@ -1,11 +1,35 @@
 "use client";
 import Advertise from "@/components/homepage/Advertise";
 import MenuList from "./menu/components/MenuList";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { htcService } from "@/utils/services/htcService";
+import Menu from "@/components/Menu";
+import { useRouter } from "next/navigation";
+
+interface ProductDTO {
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  ingredients: string;
+  category: string;
+}
 
 export default function Home() {
-
+  const router = useRouter();
+  const [topProducts, setTopProducts] = useState<ProductDTO[]>([]);
+  useEffect(() => {
+    const fetchTopSold = async () => {
+      try {
+        const res = await htcService.api.getTopSoldProducts();
+        setTopProducts(res.data as ProductDTO[]);
+      } catch (e) {
+        console.error("Error fetching top sold products:", e);
+      }
+    };
+    fetchTopSold();
+  }, []);
   useEffect(() => {
     const hasVisited = sessionStorage.getItem("visitedHome");
     if (hasVisited) {
@@ -22,7 +46,7 @@ export default function Home() {
     };
     recordVisit();
   }, []);
-  
+
   return (
     <div>
       <main className="pb-28">
@@ -38,12 +62,42 @@ export default function Home() {
               </span>
               <span className="font-medium text-[30px]">WITHOUT COFFEE</span>
             </div>
-            <div className="bg-white py-3 w-[125px] rounded-3xl text-center mt-4">
+            <div
+              onClick={() => router.push("/menu")}
+              className="bg-white py-3 w-[125px] rounded-3xl text-center mt-4 cursor-pointer"
+            >
               <span className="font-semibold text-[15px]">Order Now</span>
             </div>
           </div>
         </div>
         {/* background image */}
+
+        <div className="pt-6 flex flex-col items-center">
+          <span className="font-playfair text-[60px] font-normal">
+            Top Products
+          </span>
+          <div className="flex gap-16 pt-4 pb-11">
+            {topProducts.map((item) => (
+              <Menu
+                key={item.id}
+                id={item.id}
+                imagePath={item.image}
+                name={item.name}
+                des={item.description}
+                price={item.price}
+                category={item.category}
+              />
+            ))}
+          </div>
+          <div
+            onClick={() => router.push("/menu")}
+            className="bg-[#AD343E] py-3 px-10 rounded-3xl cursor-pointer"
+          >
+            <span className="font-poppins font-semibold text-lg text-white">
+              View All
+            </span>
+          </div>
+        </div>
 
         {/* advertise */}
         <div className="pl-[90px] py-14 pr-[120px]">

@@ -294,35 +294,6 @@
       }
     },
     "/api/orders/{id}": {
-      "get": {
-        "tags": [
-          "order-controller"
-        ],
-        "operationId": "getOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          }
-        }
-      },
       "put": {
         "tags": [
           "order-controller"
@@ -1065,6 +1036,30 @@
         }
       }
     },
+    "/api/orders/guest/{orderId}": {
+      "post": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "recordGuestOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/orders/checkout": {
       "post": {
         "tags": [
@@ -1522,6 +1517,29 @@
           "order-controller"
         ],
         "operationId": "getOrdersByUserId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/guest": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "getGuestOrder",
         "responses": {
           "200": {
             "description": "OK",

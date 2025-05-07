@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { formatCurrency } from "@/utils/format/formatCurrency";
 import { toast } from "react-toastify";
+import { useAuth } from "@/utils/context/AuthContext";
 
 const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -116,19 +117,25 @@ function OrderCard({
 }
 
 export default function OrdersPage() {
+  const { currentUser } = useAuth();
   const [orders, setOrders] = useState<OrderDTO[]>([]);
-  useEffect(() => {
-    fetchOrders();
-  }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const response = await htcService.api.getOrdersByUserId();
-      setOrders(response.data);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        if (currentUser) {
+          const response = await htcService.api.getOrdersByUserId();
+          setOrders(response.data);
+        } else {
+          const response = await htcService.api.getGuestOrder();
+          setOrders(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+    fetchOrders();
+  }, [currentUser]);
 
   const current = orders.filter((o) =>
     ["PENDING", "PROCESSING"].includes(o.orderStatus!)
@@ -147,7 +154,7 @@ export default function OrdersPage() {
           children: (
             <div className="space-y-4">
               {current.map((o) => (
-                <OrderCard fetchOrders={fetchOrders} key={o.id} order={o} />
+                <OrderCard fetchOrders={() => {}} key={o.id} order={o} />
               ))}
             </div>
           ),
@@ -158,7 +165,7 @@ export default function OrdersPage() {
           children: (
             <div className="space-y-4">
               {history.map((o) => (
-                <OrderCard fetchOrders={fetchOrders} key={o.id} order={o} />
+                <OrderCard fetchOrders={() => {}} key={o.id} order={o} />
               ))}
             </div>
           ),

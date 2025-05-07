@@ -4,6 +4,7 @@ import MenuFilter from "./MenuFilter";
 import Menu from "@/components/Menu";
 import { htcService } from "@/utils/services/htcService";
 import { ProductDTO } from "@/utils/services/Api";
+import { useSearchParams } from "next/navigation";
 
 export interface MenuFilterType {
   type: string;
@@ -34,6 +35,16 @@ const MenuList = () => {
 
   const [menuItems, setMenuItems] = useState<ProductDTO[]>([]);
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
+
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search");
+
+  useEffect(() => {
+    setFilter((prev) => ({
+      ...prev,
+      search: search ?? "",
+    }));
+  }, [search]);
 
   useEffect(() => {
     const fetchCategories = async () => {
