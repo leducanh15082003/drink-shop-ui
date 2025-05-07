@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/utils/context/AuthContext";
+import { formatCurrency } from "@/utils/format/formatCurrency";
 import { CartItemDTO, OrderRequest } from "@/utils/services/Api";
 import { htcService } from "@/utils/services/htcService";
 import { CartItem, useCartStore } from "@/utils/store/cartStore";
@@ -32,6 +33,16 @@ const CheckoutPage = () => {
     }
   }, []);
 
+  function getLoyaltyDiscount(loyaltyLevel: string) {
+    if (loyaltyLevel === "LEVEL_1") return 0.1;
+    if (loyaltyLevel === "LEVEL_2") return 0.2;
+    return 0;
+  }
+
+  const originalPrice = getTotalPrice();
+  const discount = getLoyaltyDiscount(currentUser?.loyaltyMember || "");
+  const finalPrice = originalPrice - originalPrice * discount;
+
   const handleConfirmOrder = async () => {
     if (cart.length === 0) {
       toast.info("Cart is empty!");
@@ -54,7 +65,7 @@ const CheckoutPage = () => {
         sugarRate: item.sugar,
         iceRate: item.ice,
       })),
-      totalPrice: getTotalPrice(),
+      totalPrice: finalPrice,
       discountId: discountId ? discountId : undefined,
     };
     try {
@@ -90,6 +101,31 @@ const CheckoutPage = () => {
         </span>
         <div className="flex gap-4">
           <div className="w-3/4">
+            <div className="my-8 space-y-4">
+              <p className="text-[#6E6E6E]">General</p>
+              <div className="flex gap-5 items-center">
+                <label className="text-black min-w-[100px]">Total Price</label>
+                <div className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full text-black">
+                  {discount > 0 ? (
+                    <div className="flex flex-col text-sm">
+                      <span className="line-through text-gray-400">
+                        {formatCurrency(originalPrice)}
+                      </span>
+                      <span className="text-green-600 font-semibold">
+                        {formatCurrency(finalPrice)}
+                      </span>
+                      <span className="text-xs text-yellow-600 italic">
+                        Giảm {discount * 100}% từ{" "}
+                        {currentUser?.loyaltyMember?.replace("_", " ")}
+                      </span>
+                    </div>
+                  ) : (
+                    <span>{formatCurrency(originalPrice)}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <Divider />
             <div className="my-8 space-y-4">
               <p className="text-[#6E6E6E]">General</p>
               <div className="flex gap-5 items-center">

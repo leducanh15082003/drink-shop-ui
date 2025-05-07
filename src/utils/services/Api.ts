@@ -116,6 +116,7 @@ export interface User {
   email?: string;
   password?: string;
   role?: "USER" | "ADMIN";
+  loyaltyMember?: "LEVEL_1" | "LEVEL_2";
   /** @format date-time */
   createdAt?: string;
   /** @format date-time */
@@ -279,12 +280,19 @@ export interface MonthlyRevenueDTO {
   value?: number;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -299,11 +307,15 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
-    securityData: SecurityDataType | null,
+    securityData: SecurityDataType | null
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
   secure?: boolean;
   format?: ResponseType;
@@ -323,8 +335,16 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8080" });
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
+    this.instance = axios.create({
+      ...axiosConfig,
+      baseURL: axiosConfig.baseURL || "http://localhost:8080",
+    });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -334,7 +354,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -342,7 +365,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -363,11 +390,15 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem)
+        );
       }
 
       return formData;
@@ -391,11 +422,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -502,7 +543,11 @@ export class Api<SecurityDataType extends unknown> {
      * @request PUT:/api/products/{id}
      * @secure
      */
-    updateProduct: (id: number, data: UpdateProductDTO, params: RequestParams = {}) =>
+    updateProduct: (
+      id: number,
+      data: UpdateProductDTO,
+      params: RequestParams = {}
+    ) =>
       this.http.request<Product, any>({
         path: `/api/products/${id}`,
         method: "PUT",
@@ -623,7 +668,7 @@ export class Api<SecurityDataType extends unknown> {
     updateOrderStatus: (
       id: number,
       data: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED",
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.http.request<Order, any>({
         path: `/api/orders/status/${id}`,
@@ -658,7 +703,11 @@ export class Api<SecurityDataType extends unknown> {
      * @request PUT:/api/order-details/{id}
      * @secure
      */
-    updateOrderDetail: (id: number, data: OrderDetail, params: RequestParams = {}) =>
+    updateOrderDetail: (
+      id: number,
+      data: OrderDetail,
+      params: RequestParams = {}
+    ) =>
       this.http.request<OrderDetail, any>({
         path: `/api/order-details/${id}`,
         method: "PUT",
@@ -708,7 +757,11 @@ export class Api<SecurityDataType extends unknown> {
      * @request PUT:/api/inventories/{id}
      * @secure
      */
-    updateInventory: (id: number, data: Inventory, params: RequestParams = {}) =>
+    updateInventory: (
+      id: number,
+      data: Inventory,
+      params: RequestParams = {}
+    ) =>
       this.http.request<Inventory, any>({
         path: `/api/inventories/${id}`,
         method: "PUT",
@@ -758,7 +811,11 @@ export class Api<SecurityDataType extends unknown> {
      * @request PUT:/api/discounts/{id}
      * @secure
      */
-    updateDiscount: (id: number, data: DiscountDTO, params: RequestParams = {}) =>
+    updateDiscount: (
+      id: number,
+      data: DiscountDTO,
+      params: RequestParams = {}
+    ) =>
       this.http.request<Discount, any>({
         path: `/api/discounts/${id}`,
         method: "PUT",
@@ -792,7 +849,11 @@ export class Api<SecurityDataType extends unknown> {
      * @request PUT:/api/discounts/status/{id}
      * @secure
      */
-    updateDiscountStatus: (id: number, data: boolean, params: RequestParams = {}) =>
+    updateDiscountStatus: (
+      id: number,
+      data: boolean,
+      params: RequestParams = {}
+    ) =>
       this.http.request<void, any>({
         path: `/api/discounts/status/${id}`,
         method: "PUT",
@@ -826,7 +887,11 @@ export class Api<SecurityDataType extends unknown> {
      * @request PUT:/api/categories/{id}
      * @secure
      */
-    updateCategory: (id: number, data: CategoryDTO, params: RequestParams = {}) =>
+    updateCategory: (
+      id: number,
+      data: CategoryDTO,
+      params: RequestParams = {}
+    ) =>
       this.http.request<Category, any>({
         path: `/api/categories/${id}`,
         method: "PUT",
@@ -886,7 +951,7 @@ export class Api<SecurityDataType extends unknown> {
         maxPrice?: number;
         search?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.http.request<ProductDTO[], any>({
         path: `/api/products`,
@@ -905,7 +970,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     createProduct: (data: CreateProductDTO, params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/products`,
         method: "POST",
         body: data,
@@ -922,8 +987,11 @@ export class Api<SecurityDataType extends unknown> {
      * @request POST:/api/products/update-quantity-sold
      * @secure
      */
-    updateQuantitySold: (data: ProductQuantityDTO[], params: RequestParams = {}) =>
-      this.http.request<object, any>({
+    updateQuantitySold: (
+      data: ProductQuantityDTO[],
+      params: RequestParams = {}
+    ) =>
+      this.http.request({
         path: `/api/products/update-quantity-sold`,
         method: "POST",
         body: data,
@@ -956,7 +1024,10 @@ export class Api<SecurityDataType extends unknown> {
      * @request DELETE:/api/products/favorites/{productId}
      * @secure
      */
-    deleteProductFromFavorite: (productId: number, params: RequestParams = {}) =>
+    deleteProductFromFavorite: (
+      productId: number,
+      params: RequestParams = {}
+    ) =>
       this.http.request<void, any>({
         path: `/api/products/favorites/${productId}`,
         method: "DELETE",
@@ -1177,7 +1248,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     createNewUser: (data: SignupRequestDTO, params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/auth/register`,
         method: "POST",
         body: data,
@@ -1195,7 +1266,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     authenticateUser: (data: LoginRequestDTO, params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/auth/login`,
         method: "POST",
         body: data,
@@ -1389,7 +1460,7 @@ export class Api<SecurityDataType extends unknown> {
      * @secure
      */
     getCurrentUser: (params: RequestParams = {}) =>
-      this.http.request<object, any>({
+      this.http.request({
         path: `/api/auth/me`,
         method: "GET",
         secure: true,
@@ -1460,7 +1531,7 @@ export class Api<SecurityDataType extends unknown> {
          */
         year?: number;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.http.request<MonthlyRevenueDTO[], any>({
         path: `/api/admin/statistics/revenue-data`,

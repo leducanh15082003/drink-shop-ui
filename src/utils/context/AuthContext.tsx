@@ -24,6 +24,7 @@ interface User {
   role: string;
   phoneNumber: string;
   fullName: string;
+  loyaltyMember: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -65,13 +65,22 @@ const Avatar = () => {
   return (
     <Dropdown menu={{ items }} trigger={["click"]}>
       <div>
-        <div className="h-9 w-9">
+        <div className="relative w-9 h-9">
           <img
             src="/images/avatar.png"
             alt="User Avatar"
-            className="object-cover"
+            className="object-cover w-full h-full rounded-full"
           />
+
+          {/* 🔰 Huy hiệu Loyalty ở góc phải */}
+          {currentUser?.loyaltyMember && (
+            <span className="absolute top-0 right-0 bg-yellow-500 text-white text-[10px] font-bold px-1 rounded-full shadow">
+              {currentUser?.loyaltyMember === "LEVEL_1" ? "L1" : "L2"}
+            </span>
+          )}
         </div>
+
+        {/* Tên dưới ảnh */}
         <span className="absolute text-black text-xs -bottom-[18px]">
           {truncatedFullName || ""}
         </span>

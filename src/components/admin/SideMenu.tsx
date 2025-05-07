@@ -7,6 +7,7 @@ import {
   ShoppingOutlined,
   AppstoreOutlined,
   TagsOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -20,6 +21,11 @@ const SideMenu = () => {
       label: "Management",
       type: "group",
       children: [
+        {
+          key: "",
+          icon: <DashboardOutlined />,
+          label: "Dashboard",
+        },
         {
           key: "products",
           icon: <AppstoreOutlined />,
