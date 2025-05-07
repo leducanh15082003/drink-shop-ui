@@ -62,6 +62,7 @@ export interface Order {
   discount?: Discount;
   /** @format double */
   discountAmount?: number;
+  note?: string;
 }
 
 export interface OrderDetail {
@@ -202,6 +203,7 @@ export interface OrderRequest {
   discountId?: number;
   /** @format double */
   discountAmount?: number;
+  note?: string;
 }
 
 export interface OrderDTO {
@@ -221,6 +223,7 @@ export interface OrderDTO {
   phoneNumber?: string;
   /** @format double */
   discountAmDouble?: number;
+  note?: string;
 }
 
 export interface OrderDetailsDTO {

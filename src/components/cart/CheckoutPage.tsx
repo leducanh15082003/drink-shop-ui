@@ -13,15 +13,18 @@ import { toast } from "react-toastify";
 
 const CheckoutPage = () => {
   const { currentUser } = useAuth();
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
+  const [note, setNote] = useState("");
   const { cart, discountId, clearCart, getTotalPrice } = useCartStore();
   const router = useRouter();
 
   useEffect(() => {
     if (currentUser) {
       setPhone(currentUser?.phoneNumber || "");
+      setName(currentUser?.fullName || "");
     }
   }, [currentUser, router]);
 
@@ -41,8 +44,8 @@ const CheckoutPage = () => {
 
   const originalPrice = getTotalPrice();
   const loyaltyDiscount = getLoyaltyDiscount(currentUser?.loyaltyMember || "");
-  const {discountAmount} = useCartStore.getState();
-  const priceAfterVoucher = originalPrice - discountAmount
+  const { discountAmount } = useCartStore.getState();
+  const priceAfterVoucher = originalPrice - discountAmount;
   const finalPrice = priceAfterVoucher - priceAfterVoucher * loyaltyDiscount;
 
   const handleConfirmOrder = async () => {
@@ -69,7 +72,8 @@ const CheckoutPage = () => {
       })),
       totalPrice: finalPrice,
       discountId: discountId ? discountId : undefined,
-      discountAmount: originalPrice - finalPrice
+      discountAmount: originalPrice - finalPrice,
+      note,
     };
     try {
       const response = await htcService.api.checkout(orderData);
@@ -109,35 +113,45 @@ const CheckoutPage = () => {
               <div className="flex gap-5 items-center">
                 <label className="text-black min-w-[100px]">Total Price</label>
                 <div className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full text-black">
-                {discountAmount > 0 || loyaltyDiscount > 0 ? (
-                  <div className="flex flex-col text-sm">
-                    <span className="line-through text-gray-400">
-                      {formatCurrency(originalPrice)}
-                    </span>
-                    <span className="text-green-600 font-semibold">
-                      {formatCurrency(finalPrice)}
-                    </span>
-                    {discountAmount > 0 && (
-                      <span className="text-xs text-yellow-600 italic">
-                        Giảm {formatCurrency(discountAmount)} từ voucher
+                  {discountAmount > 0 || loyaltyDiscount > 0 ? (
+                    <div className="flex flex-col text-sm">
+                      <span className="line-through text-gray-400">
+                        {formatCurrency(originalPrice)}
                       </span>
-                    )}
-                    {loyaltyDiscount > 0 && (
-                      <span className="text-xs text-yellow-600 italic">
-                        Giảm thêm {loyaltyDiscount * 100}% từ{" "}
-                        {currentUser?.loyaltyMember?.replace("_", " ")}
+                      <span className="text-green-600 font-semibold">
+                        {formatCurrency(finalPrice)}
                       </span>
-                    )}
-                  </div>
-                ) : (
-                  <span>{formatCurrency(originalPrice)}</span>
-                )}
+                      {discountAmount > 0 && (
+                        <span className="text-xs text-yellow-600 italic">
+                          Giảm {formatCurrency(discountAmount)} từ voucher
+                        </span>
+                      )}
+                      {loyaltyDiscount > 0 && (
+                        <span className="text-xs text-yellow-600 italic">
+                          Giảm thêm {loyaltyDiscount * 100}% từ{" "}
+                          {currentUser?.loyaltyMember?.replace("_", " ")}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span>{formatCurrency(originalPrice)}</span>
+                  )}
                 </div>
               </div>
             </div>
             <Divider />
             <div className="my-8 space-y-4">
               <p className="text-[#6E6E6E]">General</p>
+              <div className="flex gap-5 items-center">
+                <label className="text-black min-w-[100px]">Full Name</label>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  type="text"
+                  placeholder="Full Name"
+                  className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full text-black"
+                />
+              </div>
               <div className="flex gap-5 items-center">
                 <label className="text-black min-w-[100px]">Phone</label>
                 <input
@@ -156,6 +170,16 @@ const CheckoutPage = () => {
                   type="text"
                   placeholder="Address"
                   className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full text-black"
+                />
+              </div>
+              <div className="flex gap-5 items-start">
+                <label className="text-black min-w-[100px] mt-2">Note</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Any note about your order..."
+                  className="w-full px-4 py-2 border-[2px] border-[#F4F4F4] rounded-2xl text-black"
+                  rows={3}
                 />
               </div>
             </div>

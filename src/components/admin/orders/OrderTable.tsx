@@ -197,6 +197,9 @@ const OrderTable = () => {
               <b>Trạng thái đơn:</b> {selectedOrder.orderStatus}
             </p>
             <p>
+              <b>Ghi chú:</b> {selectedOrder.note || "Không có ghi chú"}
+            </p>
+            <p>
               <b>Thanh toán:</b> {selectedOrder.payment?.status} -{" "}
               {selectedOrder.payment?.paymentMethod}
             </p>
