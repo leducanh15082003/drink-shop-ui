@@ -2249,6 +2249,10 @@
           "discountId": {
             "type": "integer",
             "format": "int64"
+          },
+          "discountAmount": {
+            "type": "number",
+            "format": "double"
           }
         }
       },

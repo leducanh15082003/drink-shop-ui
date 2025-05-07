@@ -40,8 +40,10 @@ const CheckoutPage = () => {
   }
 
   const originalPrice = getTotalPrice();
-  const discount = getLoyaltyDiscount(currentUser?.loyaltyMember || "");
-  const finalPrice = originalPrice - originalPrice * discount;
+  const loyaltyDiscount = getLoyaltyDiscount(currentUser?.loyaltyMember || "");
+  const {discountAmount} = useCartStore.getState();
+  const priceAfterVoucher = originalPrice - discountAmount
+  const finalPrice = priceAfterVoucher - priceAfterVoucher * loyaltyDiscount;
 
   const handleConfirmOrder = async () => {
     if (cart.length === 0) {
@@ -67,6 +69,7 @@ const CheckoutPage = () => {
       })),
       totalPrice: finalPrice,
       discountId: discountId ? discountId : undefined,
+      discountAmount: originalPrice - finalPrice
     };
     try {
       const response = await htcService.api.checkout(orderData);
@@ -102,26 +105,33 @@ const CheckoutPage = () => {
         <div className="flex gap-4">
           <div className="w-3/4">
             <div className="my-8 space-y-4">
-              <p className="text-[#6E6E6E]">General</p>
+              <p className="text-[#6E6E6E]">Price</p>
               <div className="flex gap-5 items-center">
                 <label className="text-black min-w-[100px]">Total Price</label>
                 <div className="w-full px-4 py-1 border-[2px] border-[#F4F4F4] rounded-full text-black">
-                  {discount > 0 ? (
-                    <div className="flex flex-col text-sm">
-                      <span className="line-through text-gray-400">
-                        {formatCurrency(originalPrice)}
-                      </span>
-                      <span className="text-green-600 font-semibold">
-                        {formatCurrency(finalPrice)}
-                      </span>
+                {discountAmount > 0 || loyaltyDiscount > 0 ? (
+                  <div className="flex flex-col text-sm">
+                    <span className="line-through text-gray-400">
+                      {formatCurrency(originalPrice)}
+                    </span>
+                    <span className="text-green-600 font-semibold">
+                      {formatCurrency(finalPrice)}
+                    </span>
+                    {discountAmount > 0 && (
                       <span className="text-xs text-yellow-600 italic">
-                        Giảm {discount * 100}% từ{" "}
+                        Giảm {formatCurrency(discountAmount)} từ voucher
+                      </span>
+                    )}
+                    {loyaltyDiscount > 0 && (
+                      <span className="text-xs text-yellow-600 italic">
+                        Giảm thêm {loyaltyDiscount * 100}% từ{" "}
                         {currentUser?.loyaltyMember?.replace("_", " ")}
                       </span>
-                    </div>
-                  ) : (
-                    <span>{formatCurrency(originalPrice)}</span>
-                  )}
+                    )}
+                  </div>
+                ) : (
+                  <span>{formatCurrency(originalPrice)}</span>
+                )}
                 </div>
               </div>
             </div>

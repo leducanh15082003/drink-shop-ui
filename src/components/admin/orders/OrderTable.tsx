@@ -115,7 +115,7 @@ const OrderTable = () => {
           value={status}
           onChange={(newStatus) => changeOrderStatus(record.id!, newStatus)}
           style={{ width: 120 }}
-          disabled={status === "COMPLETED"}
+          disabled={status === "COMPLETED" || status === "CANCELLED"}
         >
           {Object.keys(orderStatusColors).map((status) => (
             <Option value={status} key={status}>

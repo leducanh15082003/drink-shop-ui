@@ -94,7 +94,7 @@ function OrderCard({
               title="Cancel order"
               description="Are you sure to Cancel this order?"
               onConfirm={handleCancel}
-              okText="Cancel"
+              okText="Yes"
               cancelText="Cancel"
             >
               <Button type="primary">Cancel</Button>
@@ -103,11 +103,11 @@ function OrderCard({
         </div>
         <div className="flex gap-4">
           <span className={order.discountAmDouble ? "line-through" : ""}>
-            {formatCurrency(order.price!)}
+            {formatCurrency(order.price! + order.discountAmDouble!)}
           </span>
           {order.discountAmDouble && (
             <span className="text-green-500">
-              {formatCurrency(order.price! - order.discountAmDouble)}
+              {formatCurrency(order.price!)}
             </span>
           )}
         </div>
@@ -120,20 +120,21 @@ export default function OrdersPage() {
   const { currentUser } = useAuth();
   const [orders, setOrders] = useState<OrderDTO[]>([]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        if (currentUser) {
-          const response = await htcService.api.getOrdersByUserId();
-          setOrders(response.data);
-        } else {
-          const response = await htcService.api.getGuestOrder();
-          setOrders(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching orders:", error);
+  const fetchOrders = async () => {
+    try {
+      if (currentUser) {
+        const response = await htcService.api.getOrdersByUserId();
+        setOrders(response.data);
+      } else {
+        const response = await htcService.api.getGuestOrder();
+        setOrders(response.data);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchOrders();
   }, [currentUser]);
 
@@ -154,7 +155,7 @@ export default function OrdersPage() {
           children: (
             <div className="space-y-4">
               {current.map((o) => (
-                <OrderCard fetchOrders={() => {}} key={o.id} order={o} />
+                <OrderCard fetchOrders={fetchOrders} key={o.id} order={o} />
               ))}
             </div>
           ),
@@ -165,7 +166,7 @@ export default function OrdersPage() {
           children: (
             <div className="space-y-4">
               {history.map((o) => (
-                <OrderCard fetchOrders={() => {}} key={o.id} order={o} />
+                <OrderCard fetchOrders={fetchOrders} key={o.id} order={o} />
               ))}
             </div>
           ),
